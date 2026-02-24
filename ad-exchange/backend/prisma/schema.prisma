@@ -1,0 +1,316 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int     @id @default(autoincrement())
+  email     String  @unique
+  password  String
+  role      UserRole
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  bloggerProfile BloggerProfile?
+  issuerProfile  IssuerProfile?
+  disputesResolved Dispute[] @relation("resolvedDisputies")
+  transactions   Transaction[]
+}
+
+enum UserRole {
+  BLOGGER
+  ISSUER
+  ADMIN
+}
+
+model BloggerProfile {
+  id              Int     @id @default(autoincrement())
+  userId          Int     @unique
+  displayName     String
+  avatar          String?
+  bio             String?
+  niche           String?
+  geoCountry      String?
+  telegramContact String?
+  isActive        Boolean @default(true)
+  rating          Float   @default(0)
+  totalDeals      Int     @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user              User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  socialAccounts    SocialAccount[]
+  priceListItems    PriceListItem[]
+  portfolioItems    PortfolioItem[]
+  campaignApplies   CampaignApplication[]
+  deals             Deal[] @relation("bloggerDeals")
+  reviews           Review[] @relation("bloggerReviews")
+}
+
+model SocialAccount {
+  id              Int     @id @default(autoincrement())
+  bloggerId       Int
+  platform        SocialPlatform
+  username        String
+  url             String?
+  followersCount  Int?
+  avgViews        Int?
+  engagementRate  Float?
+  isVerified      Boolean @default(false)
+  verifiedAt      DateTime?
+  createdAt       DateTime @default(now())
+
+  blogger         BloggerProfile @relation(fields: [bloggerId], references: [id], onDelete: Cascade)
+
+  @@unique([bloggerId, platform])
+}
+
+enum SocialPlatform {
+  TELEGRAM
+  YOUTUBE
+  INSTAGRAM
+  TIKTOK
+  TWITTER
+}
+
+model PriceListItem {
+  id          Int     @id @default(autoincrement())
+  bloggerId   Int
+  formatName  String
+  description String?
+  priceRub    Decimal?
+  priceUsd    Decimal?
+  priceUsdt   Decimal?
+  durationDays Int?
+  isAvailable Boolean @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  blogger     BloggerProfile @relation(fields: [bloggerId], references: [id], onDelete: Cascade)
+}
+
+model PortfolioItem {
+  id          Int     @id @default(autoincrement())
+  bloggerId   Int
+  title       String
+  description String?
+  imageUrl    String?
+  postUrl     String?
+  category    String?
+  createdAt   DateTime @default(now())
+
+  blogger     BloggerProfile @relation(fields: [bloggerId], references: [id], onDelete: Cascade)
+}
+
+model IssuerProfile {
+  id                  Int     @id @default(autoincrement())
+  userId              Int     @unique
+  companyName         String
+  logo                String?
+  description         String?
+  companyType         CompanyType
+  website             String?
+  isVerified          Boolean @default(false)
+  verifiedAt          DateTime?
+  subscriptionTier    SubscriptionTier @default(BASE)
+  subscriptionExpiresAt DateTime?
+  rating              Float   @default(0)
+  totalDeals          Int     @default(0)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  campaigns Campaign[]
+  deals     Deal[]
+  reviews   Review[] @relation("issuerReviews")
+  disputes  Dispute[]
+}
+
+enum CompanyType {
+  BROKER
+  CRYPTO_EXCHANGE
+  DEFI
+  FUND
+  OTHER
+}
+
+enum SubscriptionTier {
+  BASE
+  PRO
+}
+
+model Campaign {
+  id              Int     @id @default(autoincrement())
+  issuerId        Int
+  title           String
+  description     String?
+  brief           String?
+  budgetPerBlogger Decimal
+  currency        CurrencyType
+  bloggersNeeded  Int
+  deadline        DateTime
+  status          CampaignStatus @default(DRAFT)
+  isPrivate       Boolean @default(false)
+  platforms       String @default("[]")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  issuer          IssuerProfile @relation(fields: [issuerId], references: [id], onDelete: Cascade)
+  applications    CampaignApplication[]
+  deals           Deal[]
+}
+
+enum CampaignStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  COMPLETED
+  CANCELLED
+}
+
+enum CurrencyType {
+  RUB
+  USD
+  USDT
+}
+
+model CampaignApplication {
+  id          Int     @id @default(autoincrement())
+  campaignId  Int
+  bloggerId   Int
+  pitch       String?
+  proposedPrice Decimal
+  status      ApplicationStatus @default(PENDING)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  campaign    Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  blogger     BloggerProfile @relation(fields: [bloggerId], references: [id], onDelete: Cascade)
+  deal        Deal?
+
+  @@unique([campaignId, bloggerId])
+}
+
+enum ApplicationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+model Deal {
+  id                      Int     @id @default(autoincrement())
+  campaignApplicationId   Int?    @unique
+  issuerId                Int
+  bloggerId               Int
+  title                   String
+  brief                   String?
+  amount                  Decimal
+  currency                CurrencyType
+  platformCommission      Decimal @default(0)
+  bloggerAmount           Decimal
+  status                  DealStatus @default(CREATED)
+  contentUrl              String?
+  contentSubmittedAt      DateTime?
+  completedAt             DateTime?
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  campaignApplication     CampaignApplication? @relation(fields: [campaignApplicationId], references: [id], onDelete: SetNull)
+  issuer                  IssuerProfile @relation(fields: [issuerId], references: [id], onDelete: Cascade)
+  blogger                 BloggerProfile @relation("bloggerDeals", fields: [bloggerId], references: [id], onDelete: Cascade)
+  dispute                 Dispute?
+  reviews                 Review[]
+  transactions            Transaction[]
+}
+
+enum DealStatus {
+  CREATED
+  ESCROW_FUNDED
+  CONTENT_SUBMITTED
+  COMPLETED
+  DISPUTED
+  REFUNDED
+  CANCELLED
+}
+
+model Dispute {
+  id          Int     @id @default(autoincrement())
+  dealId      Int     @unique
+  openedBy    DisputeOpener
+  reason      String
+  description String?
+  status      DisputeStatus @default(OPEN)
+  resolution  String?
+  resolvedBy  Int?
+  resolvedAt  DateTime?
+  createdAt   DateTime @default(now())
+
+  deal        Deal @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  admin       User? @relation("resolvedDisputies", fields: [resolvedBy], references: [id], onDelete: SetNull)
+}
+
+enum DisputeOpener {
+  ISSUER
+  BLOGGER
+}
+
+enum DisputeStatus {
+  OPEN
+  UNDER_REVIEW
+  RESOLVED
+}
+
+model Review {
+  id          Int     @id @default(autoincrement())
+  dealId      Int
+  authorRole  ReviewAuthor
+  issuerId    Int?
+  bloggerId   Int?
+  rating      Int
+  comment     String?
+  createdAt   DateTime @default(now())
+
+  deal        Deal @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  issuer      IssuerProfile? @relation("issuerReviews", fields: [issuerId], references: [id], onDelete: SetNull)
+  blogger     BloggerProfile? @relation("bloggerReviews", fields: [bloggerId], references: [id], onDelete: SetNull)
+}
+
+enum ReviewAuthor {
+  ISSUER
+  BLOGGER
+}
+
+model Transaction {
+  id          Int     @id @default(autoincrement())
+  dealId      Int
+  userId      Int
+  type        TransactionType
+  amount      Decimal
+  currency    CurrencyType
+  status      TransactionStatus @default(PENDING)
+  createdAt   DateTime @default(now())
+
+  deal        Deal @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  user        User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum TransactionType {
+  ESCROW_DEPOSIT
+  PLATFORM_FEE
+  BLOGGER_PAYOUT
+  REFUND
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}

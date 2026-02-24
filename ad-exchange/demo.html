@@ -1,0 +1,2525 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Биржа Рекламы — Demo v2</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f4f5f7;color:#1a1a2e;min-height:100vh}
+.nav{background:#fff;border-bottom:1px solid #e8e8f0;padding:0 32px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:18px;color:#1a1a2e;cursor:pointer}
+.logo-icon{width:34px;height:34px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:9px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:800}
+.nav-right{display:flex;align-items:center;gap:10px}
+.nav-user{font-size:13px;color:#666;background:#f4f5f7;padding:6px 14px;border-radius:20px}
+.btn{padding:8px 18px;border-radius:8px;border:none;cursor:pointer;font-size:14px;font-weight:600;transition:.15s}
+.btn-primary{background:#6366f1;color:#fff}.btn-primary:hover{background:#5558e8}
+.btn-secondary{background:#f4f5f7;color:#444;border:1px solid #e0e0e8}.btn-secondary:hover{background:#eaeaf4}
+.btn-success{background:#dcfce7;color:#16a34a;border:none}.btn-success:hover{background:#bbf7d0}
+.btn-danger{background:#fee2e2;color:#dc2626;border:none}.btn-danger:hover{background:#fecaca}
+.btn-warning{background:#fef3c7;color:#d97706;border:none}.btn-warning:hover{background:#fde68a}
+.btn-sm{padding:5px 12px;font-size:12px;border-radius:6px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.page{display:none}.page.active{display:block;animation:fi .2s ease}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.hero{background:linear-gradient(135deg,#6366f1 0%,#8b5cf6 50%,#a855f7 100%);color:#fff;padding:80px 32px;text-align:center}
+.hero h1{font-size:48px;font-weight:900;margin-bottom:16px;letter-spacing:-1px}
+.hero p{font-size:20px;opacity:.85;max-width:560px;margin:0 auto 36px;line-height:1.6}
+.hero-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.btn-hw{background:#fff;color:#6366f1;padding:14px 32px;border-radius:12px;font-size:16px;font-weight:700;border:none;cursor:pointer;transition:.15s}
+.btn-hw:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.15)}
+.btn-ho{background:transparent;color:#fff;padding:14px 32px;border-radius:12px;font-size:16px;font-weight:700;border:2px solid rgba(255,255,255,.6);cursor:pointer;transition:.15s}
+.btn-ho:hover{background:rgba(255,255,255,.1)}
+.features{max-width:1100px;margin:0 auto;padding:64px 32px}
+.features h2{text-align:center;font-size:28px;font-weight:800;margin-bottom:32px}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.fc{background:#fff;border-radius:16px;padding:28px;box-shadow:0 2px 12px rgba(0,0,0,.06);transition:.2s}
+.fc:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.1)}
+.fc-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:16px}
+.fc h3{font-size:17px;font-weight:700;margin-bottom:8px}.fc p{font-size:14px;color:#666;line-height:1.6}
+.stats-row{display:flex;justify-content:center;gap:60px;padding:48px 32px;background:#fff;border-top:1px solid #f0f0f8}
+.sr-item{text-align:center}
+.sr-num{font-size:36px;font-weight:900;background:linear-gradient(135deg,#6366f1,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.sr-lbl{font-size:13px;color:#888;margin-top:4px}
+.app-layout{display:flex;min-height:calc(100vh - 60px)}
+.sidebar{width:220px;background:#fff;border-right:1px solid #e8e8f0;padding:20px 12px;flex-shrink:0}
+.ss{font-size:11px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.8px;padding:0 10px;margin:16px 0 6px}
+.si{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;font-size:14px;color:#555;transition:.12s;margin-bottom:2px}
+.si:hover{background:#f4f5f7;color:#333}.si.active{background:#eef2ff;color:#6366f1;font-weight:600}
+.main{flex:1;padding:28px 32px;overflow-y:auto}
+.ph{margin-bottom:24px}.ph h1{font-size:24px;font-weight:800}.ph p{font-size:14px;color:#888;margin-top:4px}
+.ph-row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:24px}
+.sc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.sc{background:#fff;border-radius:12px;padding:20px;box-shadow:0 1px 6px rgba(0,0,0,.06)}
+.sc .v{font-size:28px;font-weight:800;margin-bottom:4px}.sc .l{font-size:13px;color:#888}
+.sc.c1 .v{color:#6366f1}.sc.c2 .v{color:#16a34a}.sc.c3 .v{color:#7c3aed}.sc.c4 .v{color:#d97706}
+.sc[onclick]{transition:transform .15s,box-shadow .15s}.sc[onclick]:hover{transform:translateY(-3px);box-shadow:0 6px 20px rgba(0,0,0,.12)}
+.sc-btn{border:none;text-align:left;font-family:inherit;width:100%;cursor:pointer;pointer-events:all;transition:transform .15s,box-shadow .15s}.sc-btn:hover{transform:translateY(-3px);box-shadow:0 6px 20px rgba(0,0,0,.12)}
+.card{background:#fff;border-radius:14px;padding:22px;box-shadow:0 1px 6px rgba(0,0,0,.06);margin-bottom:20px}
+.ct{font-size:16px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.b{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600}
+.b.g{background:#dcfce7;color:#16a34a}.b.y{background:#fef9c3;color:#854d0e}
+.b.bl{background:#dbeafe;color:#1d4ed8}.b.pu{background:#f3e8ff;color:#7c3aed}
+.b.r{background:#fee2e2;color:#dc2626}.b.gr{background:#f4f5f7;color:#555}.b.in{background:#eef2ff;color:#6366f1}
+.bc{background:#fff;border-radius:14px;padding:20px;box-shadow:0 1px 8px rgba(0,0,0,.07);transition:.2s;cursor:pointer;border:2px solid transparent}
+.bc:hover{border-color:#6366f1;transform:translateY(-2px);box-shadow:0 6px 20px rgba(99,102,241,.12)}
+.bc-av{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#6366f1,#a855f7);display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;font-weight:700;margin-bottom:12px}
+.cc{background:#fff;border-radius:12px;padding:18px;box-shadow:0 1px 6px rgba(0,0,0,.06);margin-bottom:14px;border-left:4px solid #6366f1}
+.cc-title{font-size:15px;font-weight:700;margin-bottom:6px}
+.cc-desc{font-size:13px;color:#666;margin-bottom:10px;line-height:1.5}
+.pli{display:flex;align-items:center;justify-content:space-between;padding:12px;background:#f9f9fc;border-radius:8px;margin-bottom:8px}
+.pli-n{font-size:14px;font-weight:600}.pli-d{font-size:12px;color:#888;margin-top:1px}.pli-p{font-size:16px;font-weight:800;color:#6366f1}
+.soc{display:flex;align-items:center;gap:12px;padding:12px;background:#f9f9fc;border-radius:8px;margin-bottom:8px}
+.soc-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;background:#eef2ff;flex-shrink:0}
+.vb{background:#fef9c3;border:1px solid #fde68a;border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.vb-icon{font-size:24px}.vb h4{font-size:14px;font-weight:700;color:#854d0e;margin-bottom:2px}.vb p{font-size:13px;color:#92400e}
+.vb-danger{background:#fee2e2;border-color:#fca5a5}
+.vb-danger h4{color:#dc2626}.vb-danger p{color:#991b1b}
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{font-size:12px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.5px;padding:10px 12px;text-align:left;border-bottom:1px solid #f0f0f8}
+.tbl td{padding:12px;font-size:14px;border-bottom:1px solid #f4f5f7;vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}.tbl tr:hover td{background:#fafafa}
+.tbl-clickable tr:not(:first-child){cursor:pointer}
+.fg{margin-bottom:16px}.fl{display:block;font-size:13px;font-weight:600;color:#444;margin-bottom:6px}
+.fi{width:100%;padding:10px 14px;border:1.5px solid #e0e0e8;border-radius:8px;font-size:14px;transition:.12s;outline:none;background:#fff}
+.fi:focus{border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,.1)}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.tabs{display:flex;border-bottom:2px solid #f0f0f8;margin-bottom:20px}
+.tab{padding:10px 18px;cursor:pointer;font-size:14px;font-weight:600;color:#888;border-bottom:2px solid transparent;margin-bottom:-2px;transition:.12s}
+.tab.active{color:#6366f1;border-bottom-color:#6366f1}
+.tc{display:none}.tc.active{display:block}
+.login-wrap{min-height:calc(100vh - 60px);display:flex;align-items:center;justify-content:center;padding:32px}
+.lc{background:#fff;border-radius:20px;padding:40px;width:100%;max-width:420px;box-shadow:0 8px 40px rgba(0,0,0,.1)}
+.lc h2{font-size:24px;font-weight:800;margin-bottom:6px}.lc>p{font-size:14px;color:#888;margin-bottom:28px}
+.ql{display:flex;flex-direction:column;gap:8px;margin-top:20px;padding-top:20px;border-top:1px solid #f0f0f8}
+.ql-lbl{font-size:12px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.qb{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border:1.5px solid #e8e8f0;border-radius:8px;cursor:pointer;background:#fff;transition:.12s;font-size:13px}
+.qb:hover{border-color:#6366f1;background:#fafbff}
+.qb-email{font-weight:600;color:#1a1a2e}.qb-sub{font-size:12px;color:#888}
+.qb-role{font-size:11px;color:#fff;padding:2px 8px;border-radius:10px;font-weight:700}
+.qb-role.issuer{background:#6366f1}.qb-role.blogger{background:#a855f7}.qb-role.admin{background:#dc2626}
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
+.mo.open{display:flex}
+.modal{background:#fff;border-radius:20px;padding:32px;width:100%;max-width:580px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.modal-wide{max-width:780px}
+.mh{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px}
+.mc{background:none;border:none;font-size:24px;cursor:pointer;color:#aaa;line-height:1}.mc:hover{color:#333}
+.es{text-align:center;padding:40px;color:#aaa;font-size:14px}
+.es-icon{font-size:40px;margin-bottom:12px}
+.pl{padding:4px 8px;background:#f4f5f7;border-radius:6px;font-size:11px;font-weight:600;color:#555;display:inline-block;margin:2px}
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.st{font-size:15px;font-weight:700}
+.profile-header{display:flex;align-items:center;gap:20px;padding:24px;background:#fff;border-radius:14px;box-shadow:0 1px 6px rgba(0,0,0,.06);margin-bottom:20px}
+.pa{width:72px;height:72px;border-radius:16px;background:linear-gradient(135deg,#6366f1,#a855f7);display:flex;align-items:center;justify-content:center;color:#fff;font-size:28px;font-weight:700;flex-shrink:0}
+.pn{font-size:22px;font-weight:800;margin-bottom:4px}.ps{font-size:14px;color:#888}
+.pb{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.sub-card{background:#fff;border-radius:14px;padding:24px;box-shadow:0 1px 6px rgba(0,0,0,.06);border:2px solid #e8e8f0}
+.sub-card.current{border-color:#6366f1}.sub-card.pro{border-color:#a855f7}
+.sub-price{font-size:28px;font-weight:900;margin:12px 0 16px}
+.sub-features{font-size:13px;color:#555;line-height:2}
+/* FILTER BAR */
+.filter-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:20px;background:#fff;padding:14px 18px;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.filter-bar label{font-size:12px;font-weight:700;color:#888}
+.fi-sm{padding:6px 10px;border:1.5px solid #e0e0e8;border-radius:8px;font-size:13px;outline:none;background:#fff;min-width:120px}
+.fi-sm:focus{border-color:#6366f1}
+/* TAGS */
+.tags-wrap{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tag{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid #e0e0e8;color:#555;background:#fff;transition:.12s}
+.tag:hover{border-color:#6366f1;color:#6366f1}
+.tag.active{background:#eef2ff;border-color:#6366f1;color:#6366f1}
+/* CHAT */
+.chat-wrap{border:1px solid #f0f0f8;border-radius:12px;overflow:hidden}
+.chat-msgs{padding:16px;background:#fafafa;max-height:260px;overflow-y:auto;display:flex;flex-direction:column;gap:10px}
+.chat-msg{max-width:75%;padding:10px 14px;border-radius:12px;font-size:13px;line-height:1.5}
+.chat-msg.out{background:#6366f1;color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.chat-msg.in{background:#fff;border:1px solid #e8e8f0;align-self:flex-start;border-bottom-left-radius:4px}
+.chat-msg .msg-time{font-size:10px;opacity:.65;margin-top:4px}
+.chat-input-row{display:flex;gap:8px;padding:12px;border-top:1px solid #f0f0f8;background:#fff}
+.chat-input{flex:1;padding:8px 12px;border:1.5px solid #e0e0e8;border-radius:8px;font-size:13px;outline:none}
+.chat-input:focus{border-color:#6366f1}
+/* DEAL CARD */
+.deal-card{background:#fff;border-radius:12px;padding:18px;box-shadow:0 1px 6px rgba(0,0,0,.06);margin-bottom:14px;border-left:4px solid #7c3aed}
+/* COMMISSION BOX */
+.comm-box{background:linear-gradient(135deg,#f0f4ff,#f5f3ff);border:1px solid #e0e0f8;border-radius:10px;padding:14px;margin:14px 0}
+.comm-row{display:flex;justify-content:space-between;padding:4px 0;font-size:13px}
+.comm-row.total{border-top:1px solid #e0e0f8;margin-top:6px;padding-top:10px;font-weight:800;font-size:14px}
+/* CHART */
+.chart-box{background:#fff;border-radius:14px;padding:20px;box-shadow:0 1px 6px rgba(0,0,0,.06)}
+.chart-title{font-size:14px;font-weight:700;margin-bottom:16px;color:#555}
+/* USER CARD in admin */
+.user-row{display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;cursor:pointer;transition:.12s;border-bottom:1px solid #f4f5f7}
+.user-row:hover{background:#f9f9fc}
+.user-ava{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:14px;flex-shrink:0}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="logo" onclick="showPage('landing')">
+    <div class="logo-icon">БР</div>
+    Биржа Рекламы
+  </div>
+  <div class="nav-right" id="navRight">
+    <button class="btn btn-secondary btn-sm" onclick="showPage('login')">Войти</button>
+    <button class="btn btn-primary btn-sm" onclick="showPage('login')">Регистрация</button>
+  </div>
+</nav>
+
+<!-- ══════════ LANDING ══════════ -->
+<div class="page active" id="page-landing">
+  <div class="hero">
+    <h1>Биржа Рекламы</h1>
+    <p>Платформа для сотрудничества финансовых компаний и крипто-блогеров. Безопасные сделки через эскроу.</p>
+    <div class="hero-btns">
+      <button class="btn-hw" onclick="quickLogin('blogger')">Я блогер →</button>
+      <button class="btn-ho" onclick="quickLogin('issuer')">Я эмитент →</button>
+    </div>
+  </div>
+  <div class="features">
+    <h2>Как это работает</h2>
+    <div class="features-grid">
+      <div class="fc"><div class="fc-icon" style="background:#eef2ff">🤝</div><h3>Прямые сделки</h3><p>Эмитент выбирает блогера из каталога и предлагает условия сделки. Блогер принимает или отклоняет.</p></div>
+      <div class="fc"><div class="fc-icon" style="background:#f5f3ff">📢</div><h3>Кампании</h3><p>Запускайте кампании для нескольких блогеров сразу. Блогеры откликаются, вы выбираете лучших.</p></div>
+      <div class="fc"><div class="fc-icon" style="background:#fdf2f8">🔒</div><h3>Эскроу-защита</h3><p>Средства замораживаются до подтверждения размещения. Комиссия платформы +10% (мин.) к стоимости автора.</p></div>
+    </div>
+  </div>
+  <div class="stats-row">
+    <div class="sr-item"><div class="sr-num">500+</div><div class="sr-lbl">Блогеров</div></div>
+    <div class="sr-item"><div class="sr-num">120+</div><div class="sr-lbl">Компаний</div></div>
+    <div class="sr-item"><div class="sr-num">₽18М+</div><div class="sr-lbl">Объём сделок</div></div>
+    <div class="sr-item"><div class="sr-num">4.8★</div><div class="sr-lbl">Средний рейтинг</div></div>
+  </div>
+</div>
+
+<!-- ══════════ LOGIN ══════════ -->
+<div class="page" id="page-login">
+  <div class="login-wrap">
+    <div class="lc">
+      <h2>Войти в аккаунт</h2>
+      <p>Добро пожаловать на Биржу Рекламы</p>
+      <div class="fg"><label class="fl">Email</label><input class="fi" id="loginEmail" type="email" placeholder="you@example.com"></div>
+      <div class="fg"><label class="fl">Пароль</label><input class="fi" id="loginPassword" type="password" placeholder="••••••"></div>
+      <button class="btn btn-primary" style="width:100%;padding:12px" onclick="doLogin()">Войти</button>
+      <div class="ql">
+        <div class="ql-lbl">Быстрый вход</div>
+        <div class="qb" onclick="quickLogin('issuer')"><div><div class="qb-email">issuer1@test.ru</div><div class="qb-sub">BingX Exchange · верифицирован</div></div><span class="qb-role issuer">ЭМИТЕНТ</span></div>
+        <div class="qb" onclick="quickLogin('issuer2')"><div><div class="qb-email">issuer2@test.ru</div><div class="qb-sub">InvestFund Alpha · на проверке</div></div><span class="qb-role issuer">ЭМИТЕНТ</span></div>
+        <div class="qb" onclick="quickLogin('blogger')"><div><div class="qb-email">blogger1@test.ru</div><div class="qb-sub">Крипто Блогер · 15K TG, 25K YT</div></div><span class="qb-role blogger">БЛОГЕР</span></div>
+        <div class="qb" onclick="quickLogin('admin')"><div><div class="qb-email">admin@adexchange.ru</div><div class="qb-sub">Панель администратора</div></div><span class="qb-role admin">ADMIN</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ ISSUER ══════════ -->
+<div class="page" id="page-issuer">
+  <div class="app-layout">
+    <div class="sidebar">
+      <div class="ss">Меню</div>
+      <div class="si active" onclick="iTab('dashboard',this)"><span>🏠</span> Дашборд</div>
+      <div class="si" onclick="iTab('catalog',this)"><span>👥</span> Каталог блогеров</div>
+      <div class="si" onclick="iTab('campaigns',this)"><span>📢</span> Кампании</div>
+      <div class="si" onclick="iTab('deals',this)"><span>🤝</span> Сделки</div>
+      <div class="ss">Профиль</div>
+      <div class="si" onclick="iTab('profile',this)"><span>🏢</span> Компания</div>
+      <div class="si" onclick="iTab('sub',this)"><span>💎</span> Подписка</div>
+    </div>
+    <div class="main">
+
+      <!-- i-dashboard -->
+      <div class="tc active" id="i-dashboard">
+        <div id="issuerBanner" class="vb" style="display:none">
+          <div class="vb-icon">⏳</div>
+          <div style="flex:1"><h4>Аккаунт на верификации</h4><p>Наша команда проверяет ваши данные. Обычно 1–2 рабочих дня. Создание кампаний временно недоступно.</p></div>
+        </div>
+        <div class="ph-row">
+          <div class="ph"><h1 id="iTitle">Панель эмитента</h1><p id="iSub">BingX Exchange</p></div>
+          <button class="btn btn-primary" id="btnNewCampaign" onclick="tryCreateCampaign()">+ Новая кампания</button>
+        </div>
+        <div class="sc-grid">
+          <div class="sc c1"><div class="v" id="iStatCamp">0</div><div class="l">Активных кампаний</div></div>
+          <div class="sc c2"><div class="v" id="iStatBudget">₽0</div><div class="l">Бюджет кампаний</div></div>
+          <div class="sc c3"><div class="v" id="iStatTier">BASE</div><div class="l">Подписка</div></div>
+          <div class="sc c4"><div class="v" id="iStatStatus">✓</div><div class="l">Статус</div></div>
+        </div>
+        <div class="g2">
+          <div class="card">
+            <div class="ct">📢 Мои кампании</div>
+            <div id="iDashCampaigns"></div>
+          </div>
+          <div class="card">
+            <div class="ct">🤝 Последние сделки</div>
+            <div id="iDashDeals"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- i-catalog -->
+      <div class="tc" id="i-catalog">
+        <div class="ph-row">
+          <div class="ph"><h1>Каталог блогеров</h1><p>Найдите подходящих авторов для размещения</p></div>
+        </div>
+        <div class="filter-bar">
+          <label>Ниша:</label>
+          <select class="fi-sm" id="catFilterNiche" onchange="renderCatalog()">
+            <option value="">Все</option>
+            <option value="крипто">Крипто</option>
+            <option value="инвестиции">Инвестиции</option>
+            <option value="DeFi">DeFi / Web3</option>
+          </select>
+          <label>Сортировать:</label>
+          <select class="fi-sm" id="catSort" onchange="renderCatalog()">
+            <option value="rating">По рейтингу</option>
+            <option value="price_asc">Цена: сначала дешевле</option>
+            <option value="price_desc">Цена: сначала дороже</option>
+            <option value="subs">По подписчикам</option>
+          </select>
+          <label>Платформа:</label>
+          <select class="fi-sm" id="catFilterPlat" onchange="renderCatalog()">
+            <option value="">Все</option>
+            <option value="Telegram">Telegram</option>
+            <option value="YouTube">YouTube</option>
+            <option value="VK">VK</option>
+            <option value="Яндекс.Дзен">Яндекс.Дзен</option>
+            <option value="Instagram">Instagram</option>
+          </select>
+        </div>
+        <div class="g3" id="catalogGrid"></div>
+        <div id="catalogEmpty" class="es" style="display:none"><div class="es-icon">🔍</div>Нет блогеров по выбранным фильтрам</div>
+      </div>
+
+      <!-- i-campaigns -->
+      <div class="tc" id="i-campaigns">
+        <div class="ph-row">
+          <div class="ph"><h1>Мои кампании</h1></div>
+          <button class="btn btn-primary" onclick="tryCreateCampaign()">+ Новая кампания</button>
+        </div>
+        <div id="iCampaignsList"></div>
+      </div>
+
+      <!-- i-deals -->
+      <div class="tc" id="i-deals">
+        <div class="ph"><h1>Сделки</h1><p>История и статус ваших сделок</p></div>
+        <div id="iDealsList"></div>
+      </div>
+
+      <!-- i-profile -->
+      <div class="tc" id="i-profile">
+        <div class="ph"><h1>Профиль компании</h1></div>
+        <div class="card" id="iProfileCard"></div>
+      </div>
+
+      <!-- i-sub -->
+      <div class="tc" id="i-sub">
+        <div class="ph"><h1>Подписка</h1></div>
+        <div class="g2">
+          <div class="sub-card current" id="subBase">
+            <div style="display:flex;align-items:center;justify-content:space-between"><b style="font-size:16px">🔵 BASE</b><span class="b in" id="subBaseBadge">Текущий план</span></div>
+            <div class="sub-price">Бесплатно</div>
+            <div class="sub-features">✓ Доступ к каталогу блогеров<br>✓ До 5 кампаний в месяц<br>✓ Прямые сделки<br><span style="color:#aaa">✗ Приватные кампании<br>✗ Расширенная аналитика</span></div>
+          </div>
+          <div class="sub-card pro" id="subPro">
+            <div style="display:flex;align-items:center;justify-content:space-between"><b style="font-size:16px">💎 PRO</b><span class="b pu" id="subProBadge">Апгрейд</span></div>
+            <div class="sub-price">₽15 000 <span style="font-size:14px;font-weight:400;color:#888">/ мес</span></div>
+            <div class="sub-features">✓ Всё из BASE<br>✓ Безлимит кампаний<br>✓ Приватные кампании 🔒<br>✓ Расширенная аналитика блогеров<br>✓ Приоритетная поддержка</div>
+            <button class="btn btn-primary" style="width:100%;margin-top:16px" id="btnSubPro" onclick="activatePro()">Перейти на PRO — ₽15 000/мес</button>
+          </div>
+        </div>
+        <div style="margin-top:16px;padding:14px 18px;background:#fff;border-radius:12px;box-shadow:0 1px 6px rgba(0,0,0,.06);font-size:13px;color:#888">
+          💳 Оплата через Stripe / ЮKassa. Подключение платёжного шлюза — в production-версии.
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ BLOGGER ══════════ -->
+<div class="page" id="page-blogger">
+  <div class="app-layout">
+    <div class="sidebar">
+      <div class="ss">Меню</div>
+      <div class="si active" onclick="bTab('dashboard',this)"><span>🏠</span> Дашборд</div>
+      <div class="si" onclick="bTab('profile',this)"><span>👤</span> Профиль</div>
+      <div class="si" onclick="bTab('campaigns',this)"><span>📢</span> Кампании</div>
+      <div class="si" onclick="bTab('deals',this)"><span>🤝</span> Сделки</div>
+    </div>
+    <div class="main">
+
+      <!-- b-dashboard -->
+      <div class="tc active" id="b-dashboard">
+        <div class="ph"><h1 id="bTitle">Панель блогера</h1><p>Добро пожаловать!</p></div>
+        <div class="sc-grid">
+          <div class="sc c2" onclick="bTab('deals',document.querySelectorAll('#page-blogger .si')[3])" style="cursor:pointer" title="Открыть сделки"><div class="v">1</div><div class="l">Активных сделок ↗</div></div>
+          <div class="sc c1" onclick="openModal('mEarnings')" style="cursor:pointer" title="История заработка"><div class="v">₽30 000</div><div class="l">Заработано ↗</div></div>
+          <div class="sc c4"><div class="v" id="bRating">★ 4.3</div><div class="l">Рейтинг</div></div>
+          <div class="sc c3" onclick="openModal('mCompletedDeals')" style="cursor:pointer" title="Завершённые сделки"><div class="v">3</div><div class="l">Завершённых ↗</div></div>
+        </div>
+        <div class="g2">
+          <div class="card">
+            <div class="ct">📢 Доступные кампании</div>
+            <div class="cc">
+              <div class="cc-title">BingX — Осенний набор блогеров</div>
+              <div class="cc-desc">Ищем 10 крипто-блогеров. BingX Exchange.</div>
+              <div style="display:flex;align-items:center;justify-content:space-between"><span class="b in">₽25 000</span><button class="btn btn-primary btn-sm" onclick="bTab('campaigns', document.querySelector('#page-blogger .si:nth-child(4)'))">Смотреть →</button></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="ct">🔔 Предложения от эмитентов</div>
+            <div class="deal-card">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                <div><div style="font-size:14px;font-weight:700">BingX Exchange</div><div style="font-size:12px;color:#888;margin-top:2px">Предложение сделки · Telegram пост</div></div>
+                <span class="b y">На рассмотрении</span>
+              </div>
+              <div style="font-size:13px;color:#666;margin:8px 0">Рекламный пост о BingX в TG. ТЗ прикреплено.</div>
+              <div style="display:flex;gap:8px">
+                <button class="btn btn-success btn-sm" onclick="showToast('✓ Сделка принята!')">Принять</button>
+                <button class="btn btn-secondary btn-sm" onclick="bTab('deals', document.querySelector('#page-blogger .si:nth-child(5)'))">Открыть чат →</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- b-profile -->
+      <div class="tc" id="b-profile">
+        <div class="ph"><h1>Мой профиль</h1></div>
+        <div class="profile-header">
+          <div style="position:relative;cursor:pointer" onclick="document.getElementById('bAvatarInput').click()" title="Нажмите для загрузки фото">
+            <div class="pa" id="bAvatar">К</div>
+            <div style="position:absolute;bottom:-4px;right:-4px;width:22px;height:22px;background:#6366f1;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;border:2px solid #fff">✏️</div>
+          </div>
+          <input type="file" id="bAvatarInput" accept="image/*" style="display:none" onchange="previewBloggerAvatar(this)">
+          <div>
+            <div class="pn" id="bName">Крипто Блогер 1</div>
+            <div class="ps" id="bNicheGeo">крипто · Россия · @cryptoblogger1</div>
+            <div class="pb"><span class="b g">✓ Активен</span><span class="b in" id="bRatingBadge">★ 4.3</span><span class="b gr">3 сделки</span></div>
+          </div>
+        </div>
+        <div class="tabs">
+          <div class="tab active" onclick="pTab('basic',this)">Основное</div>
+          <div class="tab" onclick="pTab('socials',this)">Соцсети</div>
+          <div class="tab" onclick="pTab('prices',this)">Прайс-лист</div>
+        </div>
+        <div class="tc active" id="pt-basic">
+          <div class="card">
+            <div class="fr"><div class="fg"><label class="fl">Отображаемое имя</label><input class="fi" id="bInputName" value="Крипто Блогер 1"></div><div class="fg"><label class="fl">Telegram</label><input class="fi" value="@cryptoblogger1"></div></div>
+            <div class="fr"><div class="fg"><label class="fl">Ниша</label><input class="fi" id="bInputNiche" value="крипто, инвестиции, DeFi"></div><div class="fg"><label class="fl">Гео</label><input class="fi" value="Россия, СНГ"></div></div>
+            <div class="fg"><label class="fl">О себе</label><textarea class="fi" rows="3">Пишу про крипту и инвестиции уже 3 года. Аудитория: 18-35 лет, РФ/СНГ. Специализация: обзоры бирж, DeFi протоколы, трейдинг.</textarea></div>
+            <div class="fg">
+              <label class="fl">Теги профиля (о чём пишу)</label>
+              <div class="tags-wrap" id="profileTags"></div>
+            </div>
+            <button class="btn btn-primary" onclick="saveProfile()">Сохранить</button>
+          </div>
+        </div>
+        <div class="tc" id="pt-socials">
+          <div class="card">
+            <div id="socialsList"></div>
+            <div style="border-top:1px solid #f0f0f8;margin-top:16px;padding-top:16px">
+              <div class="st" style="margin-bottom:12px">Добавить соцсеть</div>
+              <div class="fr">
+                <div class="fg">
+                  <label class="fl">Платформа</label>
+                  <select class="fi" id="addSocPlatform">
+                    <option>Telegram</option>
+                    <option>YouTube</option>
+                    <option>VK</option>
+                    <option>Яндекс.Дзен</option>
+                    <option>Instagram</option>
+                    <option>TikTok</option>
+                    <option>Twitter/X</option>
+                  </select>
+                </div>
+                <div class="fg"><label class="fl">Ссылка / username</label><input class="fi" id="addSocLink" placeholder="https://t.me/username"></div>
+              </div>
+              <div class="fr">
+                <div class="fg"><label class="fl">Подписчики</label><input class="fi" id="addSocSubs" type="number" placeholder="15000"></div>
+                <div class="fg"><label class="fl">Просмотры / охват</label><input class="fi" id="addSocViews" placeholder="8 000"></div>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="addSocial()">+ Добавить</button>
+            </div>
+          </div>
+        </div>
+        <div class="tc" id="pt-prices">
+          <div class="card">
+            <div id="pricesList"></div>
+            <div style="border-top:1px solid #f0f0f8;margin-top:16px;padding-top:16px">
+              <div class="st" style="margin-bottom:12px">Добавить формат</div>
+              <div class="fr">
+                <div class="fg"><label class="fl">Название</label><input class="fi" id="addPriceName" placeholder="Пост в Telegram"></div>
+                <div class="fg"><label class="fl">Цена (₽)</label><input class="fi" type="number" id="addPriceVal" placeholder="10000"></div>
+              </div>
+              <div class="fg"><label class="fl">Описание</label><input class="fi" id="addPriceDesc" placeholder="Что включает формат..."></div>
+              <button class="btn btn-primary btn-sm" onclick="addPrice()">+ Добавить</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- b-campaigns -->
+      <div class="tc" id="b-campaigns">
+        <div class="ph"><h1>Доступные кампании</h1><p>Откликнитесь на подходящие предложения</p></div>
+        <div class="filter-bar">
+          <label>Ниша:</label>
+          <select class="fi-sm" id="bCampFilterNiche" onchange="renderBloggerCampaigns()">
+            <option value="">Все</option>
+            <option value="крипто">Крипто</option>
+            <option value="инвестиции">Инвестиции</option>
+            <option value="DeFi">DeFi</option>
+          </select>
+          <label>Платформа:</label>
+          <select class="fi-sm" id="bCampFilterPlat" onchange="renderBloggerCampaigns()">
+            <option value="">Любая</option>
+            <option value="Telegram">Telegram</option>
+            <option value="YouTube">YouTube</option>
+            <option value="VK">VK</option>
+          </select>
+          <label>Сортировать:</label>
+          <select class="fi-sm" id="bCampSort" onchange="renderBloggerCampaigns()">
+            <option value="budget_desc">Бюджет: сначала больше</option>
+            <option value="budget_asc">Бюджет: сначала меньше</option>
+            <option value="date">По дедлайну</option>
+          </select>
+        </div>
+        <div id="bCampaignsList"></div>
+      </div>
+
+      <!-- b-deals -->
+      <div class="tc" id="b-deals">
+        <div class="ph-row">
+          <div class="ph"><h1>Мои сделки</h1></div>
+          <button class="btn btn-secondary btn-sm" onclick="bTab('dashboard',document.querySelectorAll('#page-blogger .si')[0])">← На дашборд</button>
+        </div>
+        <div class="deal-card">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+            <div>
+              <div style="font-size:16px;font-weight:800">BingX Exchange → Пост в Telegram</div>
+              <div style="font-size:12px;color:#888;margin-top:3px">Создана: 20 фев 2026 · Дедлайн: 1 мар 2026</div>
+            </div>
+            <span class="b y">На рассмотрении</span>
+          </div>
+          <div style="background:#f9f9fc;border-radius:8px;padding:12px;margin-bottom:14px">
+            <div style="font-size:12px;font-weight:700;color:#888;margin-bottom:6px">📋 ТЗ от эмитента:</div>
+            <div style="font-size:13px;color:#444;line-height:1.6">Написать нативный пост в Telegram о BingX Exchange. Упомянуть: торговые пары BTC/USDT, ETH/USDT, кешбэк 20%, реф. программа до 45%. Добавить ссылку с UTM. Объём 300–500 символов. Согласовать текст до публикации.</div>
+          </div>
+          <div style="background:#f0f4ff;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:13px">
+            <div style="display:flex;justify-content:space-between"><span style="color:#555">Ваш гонорар:</span><span style="font-weight:800;color:#16a34a">₽10 000</span></div>
+            <div style="display:flex;justify-content:space-between;color:#888;margin-top:3px"><span>Комиссия платформы (+10%, мин.):</span><span>₽1 000 — платит эмитент</span></div>
+          </div>
+          <div style="display:flex;gap:8px;margin-bottom:14px">
+            <button class="btn btn-success btn-sm" onclick="showToast('✓ Сделка принята!')">✓ Принять</button>
+            <button class="btn btn-secondary btn-sm" onclick="showToast('✗ Предложение отклонено')">✗ Отклонить</button>
+            <button class="btn btn-danger btn-sm" style="margin-left:auto" onclick="openDisputeModal(1)">⚠️ Открыть спор</button>
+          </div>
+          <div class="chat-wrap">
+            <div class="chat-msgs" id="dealChatMsgs">
+              <div class="chat-msg in"><b>BingX Exchange</b><br>Привет! Высылаю ТЗ на пост. Пожалуйста, согласуйте текст до публикации.<br><div onclick="mockDownload('ТЗ_BingX_Весна2026.docx')" style="display:inline-flex;align-items:center;gap:5px;background:rgba(0,0,0,.06);border-radius:6px;padding:4px 8px;margin-top:4px;cursor:pointer;font-size:12px;font-weight:600;border:1px solid #e0e0e0" title="Нажмите для скачивания">📄 ТЗ_BingX_Весна2026.docx</div><div class="msg-time">20 фев, 14:32</div></div>
+              <div class="chat-msg out">Получил, изучу сегодня и напишу набросок.<div class="msg-time">20 фев, 15:10</div></div>
+              <div class="chat-msg in">Отлично! Жду 🙌<div class="msg-time">20 фев, 15:12</div></div>
+            </div>
+            <div id="chatAttachChips" style="display:none;padding:6px 12px 0;background:#fff;display:none;flex-wrap:wrap;gap:6px"></div>
+            <div class="chat-input-row">
+              <button class="btn btn-secondary btn-sm" onclick="document.getElementById('chatFileInput').click()" title="Прикрепить файл" style="flex-shrink:0;padding:6px 10px;font-size:16px">📎</button>
+              <input type="file" id="chatFileInput" accept=".doc,.docx,.pptx,.pdf,.xlsx,.png,.jpg,.jpeg" style="display:none" onchange="attachChatFile(this)">
+              <input class="chat-input" id="chatInput" placeholder="Написать сообщение..." onkeydown="if(event.key==='Enter')sendChatMsg()" style="flex:1">
+              <button class="btn btn-primary btn-sm" onclick="sendChatMsg()" style="flex-shrink:0">Отправить</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ ADMIN ══════════ -->
+<div class="page" id="page-admin">
+  <div class="app-layout">
+    <div class="sidebar">
+      <div class="ss">Меню</div>
+      <div class="si active" onclick="aTab('dashboard',this)"><span>📊</span> Дашборд</div>
+      <div class="si" onclick="aTab('verify',this)"><span>✅</span> Верификация <span id="verifyBadgeSidebar" class="b r" style="margin-left:auto;font-size:10px;padding:1px 6px"></span></div>
+      <div class="si" onclick="aTab('disputes',this)"><span>⚠️</span> Споры</div>
+      <div class="si" onclick="aTab('users',this)"><span>👥</span> Пользователи</div>
+      <div class="si" onclick="aTab('commissions',this)"><span>⚙️</span> Комиссии</div>
+      <div class="si" onclick="aTab('tags',this)"><span>🏷️</span> Теги авторов</div>
+    </div>
+    <div class="main">
+
+      <!-- a-dashboard -->
+      <div class="tc active" id="a-dashboard">
+        <div class="ph"><h1>Панель администратора</h1><p>Статистика платформы в реальном времени</p></div>
+        <div class="sc-grid">
+          <button class="sc c1 sc-btn" id="statBtn-users" title="Нажмите для детальной статистики"><div class="v" id="aStatUsers">6</div><div class="l">Пользователей ↗</div></button>
+          <button class="sc c3 sc-btn" id="statBtn-bloggers" title="Статистика блогеров"><div class="v">3</div><div class="l">Блогеров ↗</div></button>
+          <button class="sc c4 sc-btn" id="statBtn-issuers" title="Статистика эмитентов"><div class="v">2</div><div class="l">Эмитентов ↗</div></button>
+          <button class="sc c2 sc-btn" id="statBtn-escrow" title="Объём эскроу"><div class="v">₽11 000</div><div class="l">Объём эскроу ↗</div></button>
+        </div>
+        <div class="g2" style="margin-bottom:20px">
+          <div class="chart-box">
+            <div class="chart-title">📈 Объём сделок по месяцам (₽)</div>
+            <canvas id="chartDeals" width="340" height="180"></canvas>
+          </div>
+          <div class="chart-box">
+            <div class="chart-title">👥 Регистрации пользователей</div>
+            <canvas id="chartUsers" width="340" height="180"></canvas>
+          </div>
+        </div>
+        <div class="g2">
+          <div class="chart-box">
+            <div class="chart-title">💰 Комиссия платформы (₽)</div>
+            <canvas id="chartComm" width="340" height="160"></canvas>
+          </div>
+          <div class="card" style="margin-bottom:0">
+            <div class="ct">⏳ Ожидают верификации</div>
+            <div id="adminVerifyQueue"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- a-verify -->
+      <div class="tc" id="a-verify">
+        <div class="ph"><h1>Верификация эмитентов</h1></div>
+        <div class="card" id="aVerifyCard"></div>
+      </div>
+
+      <!-- a-disputes -->
+      <div class="tc" id="a-disputes">
+        <div class="ph-row">
+          <div class="ph"><h1>Споры</h1><p>Управление активными конфликтами между сторонами</p></div>
+          <span class="b r" id="disputeCount">2 открытых</span>
+        </div>
+        <div id="aDisputesList"></div>
+      </div>
+
+      <!-- a-users -->
+      <div class="tc" id="a-users">
+        <div class="ph"><h1>Пользователи</h1><p>Нажмите на строку для просмотра деталей</p></div>
+        <div class="card"><div id="aUsersList"></div></div>
+      </div>
+
+      <!-- a-commissions -->
+      <div class="tc" id="a-commissions">
+        <div class="ph"><h1>Управление комиссиями</h1><p>Индивидуальные ставки для блогеров и эксклюзивных услуг</p></div>
+
+        <!-- Глобальная ставка -->
+        <div class="card" style="margin-bottom:20px">
+          <div class="ct">🌐 Глобальная ставка платформы</div>
+          <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+            <div style="flex:1;min-width:200px">
+              <div style="font-size:13px;color:#888;margin-bottom:6px">Применяется ко всем сделкам без индивидуальной ставки</div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <input class="fi" type="number" id="globalCommInput" min="0" max="50" step="0.5" value="10" style="width:100px">
+                <span style="font-size:16px;font-weight:700">%</span>
+                <button class="btn btn-primary btn-sm" onclick="saveGlobalComm()">Сохранить</button>
+              </div>
+            </div>
+            <div class="sc c2" style="padding:14px;min-width:140px">
+              <div class="v" id="globalCommDisplay">10%</div>
+              <div class="l">Текущая ставка</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Индивидуальные ставки блогеров -->
+        <div class="card" style="margin-bottom:20px">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap">
+            <div class="ct" style="margin-bottom:0">👤 Индивидуальные ставки для блогеров</div>
+            <input class="fi" id="commBloggerSearch" placeholder="🔍 Поиск по имени или нише..." oninput="renderBloggerCommList(this.value)" style="max-width:260px;padding:7px 12px;font-size:13px">
+          </div>
+          <div style="font-size:13px;color:#888;margin-bottom:12px">Нажмите на строку блогера чтобы развернуть и задать ставки для каждой услуги отдельно.</div>
+          <div id="bloggerCommList"></div>
+        </div>
+
+        <!-- Эксклюзивные услуги -->
+        <div class="card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+            <div class="ct" style="margin-bottom:0">🌟 Эксклюзивные услуги платформы</div>
+            <button class="btn btn-primary btn-sm" onclick="addExclusiveService()">+ Добавить</button>
+          </div>
+          <div style="font-size:13px;color:#888;margin-bottom:14px">Услуги, эксклюзивно доступные только через нашу биржу. Можно установить отдельную ставку комиссии.</div>
+          <div id="exclusiveServicesList"></div>
+        </div>
+      </div>
+
+      <!-- a-tags -->
+      <div class="tc" id="a-tags">
+        <div class="ph"><h1>Теги авторов</h1><p>Управление доступными тегами для профилей блогеров</p></div>
+        <div class="card" style="margin-bottom:20px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+            <div class="ct" style="margin-bottom:0">🏷️ Все теги платформы</div>
+            <button class="btn btn-primary btn-sm" onclick="addAdminTag()">+ Добавить тег</button>
+          </div>
+          <div style="font-size:13px;color:#888;margin-bottom:14px">Блогеры выбирают из этих тегов при заполнении профиля. Максимум 8 тегов на автора.</div>
+          <div id="adminTagsList" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+        </div>
+        <div class="card">
+          <div class="ct" style="margin-bottom:12px">📊 Популярность тегов</div>
+          <div id="adminTagsStats" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ MODAL: BLOGGER DETAIL ══════════ -->
+<div class="mo" id="mBlogger">
+  <div class="modal modal-wide">
+    <div class="mh">
+      <div><h2 id="mBName" style="font-size:22px;font-weight:800"></h2><p id="mBSub" style="font-size:14px;color:#888;margin-top:4px"></p></div>
+      <button class="mc" onclick="closeModal('mBlogger')">×</button>
+    </div>
+    <div id="mBBody"></div>
+    <div style="margin-top:20px;padding-top:16px;border-top:1px solid #f0f0f8">
+      <button class="btn btn-primary" style="width:100%;padding:12px" onclick="closeModal('mBlogger');openDealModal()">🤝 Предложить сделку</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ MODAL: CAMPAIGN ══════════ -->
+<div class="mo" id="mCampaign">
+  <div class="modal">
+    <div class="mh"><h2 style="font-size:20px;font-weight:800">Новая кампания</h2><button class="mc" onclick="closeModal('mCampaign')">×</button></div>
+    <div class="fg"><label class="fl">Название *</label><input class="fi" id="campName" placeholder="BingX — осенний набор"></div>
+    <div class="fg"><label class="fl">Описание *</label><textarea class="fi" id="campDesc" rows="3" placeholder="Что нужно рассказать блогерам..."></textarea></div>
+    <div class="fg">
+      <label class="fl">Ниша / Тематика</label>
+      <select class="fi" id="campNiche">
+        <option value="крипто">Крипто</option>
+        <option value="инвестиции">Инвестиции</option>
+        <option value="DeFi">DeFi / Web3</option>
+        <option value="трейдинг">Трейдинг</option>
+      </select>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Бюджет на блогера (₽) *</label><input class="fi" type="number" id="campBudget" placeholder="25000"></div>
+      <div class="fg"><label class="fl">Нужно блогеров</label><input class="fi" type="number" id="campCount" value="5"></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Дедлайн</label><input class="fi" type="date" id="campDeadline"></div>
+      <div class="fg"><label class="fl">Платформы</label>
+        <select class="fi" id="campPlatform">
+          <option>Telegram</option>
+          <option>YouTube</option>
+          <option>VK</option>
+          <option>Яндекс.Дзен</option>
+          <option>Любая</option>
+        </select>
+      </div>
+    </div>
+    <div class="fg" style="display:flex;align-items:center;gap:8px"><label style="display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer"><input type="checkbox" style="width:16px;height:16px;accent-color:#6366f1"> <span>Приватная кампания <span style="font-size:11px;color:#a855f7;font-weight:700">(PRO)</span></span></label></div>
+    <button class="btn btn-primary" style="width:100%;padding:12px;margin-top:8px" onclick="createCampaign()">Создать кампанию</button>
+  </div>
+</div>
+
+<!-- ══════════ MODAL: DEAL ══════════ -->
+<div class="mo" id="mDeal">
+  <div class="modal">
+    <div class="mh">
+      <div><h2 style="font-size:20px;font-weight:800">Предложить сделку</h2><p id="mDealFor" style="font-size:14px;color:#888"></p></div>
+      <button class="mc" onclick="closeModal('mDeal')">×</button>
+    </div>
+    <div class="fg">
+      <label class="fl">1️⃣ Выберите соцсеть / канал блогера</label>
+      <select class="fi" id="dealSocial" onchange="filterDealFormats(this.value)">
+        <option value="">— выберите платформу —</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label class="fl">2️⃣ Формат размещения</label>
+      <select class="fi" id="dealFormat" onchange="setDealFormat()">
+        <option value="">— сначала выберите соцсеть —</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label class="fl">Сумма блогера (₽) *</label>
+      <input class="fi" type="number" id="dealAmt" placeholder="10000" oninput="calcComm()">
+      <div id="specProjHint" style="display:none;margin-top:6px;padding:8px 12px;background:#f0f0ff;border-radius:8px;font-size:12px;color:#6366f1">
+        💼 <b>Спецпроект:</b> Введите согласованную с блогером сумму. Комиссия платформы будет рассчитана автоматически.
+      </div>
+    </div>
+    <div class="comm-box" id="commBox" style="display:none">
+      <div class="comm-row"><span style="color:#555">Гонорар автора:</span><span id="c-blogger" style="font-weight:700;color:#16a34a"></span></div>
+      <div class="comm-row"><span style="color:#888" id="c-comm-label">Комиссия платформы:</span><span id="c-comm" style="color:#888"></span></div>
+      <div class="comm-row total"><span>Итого к оплате эмитентом:</span><span id="c-total" style="color:#6366f1"></span></div>
+    </div>
+    <div class="fg"><label class="fl">Дедлайн</label><input class="fi" type="date" id="dealDeadline"></div>
+    <div class="fg"><label class="fl">📋 Техническое задание (ТЗ) *</label><textarea class="fi" id="dealTZ" rows="4" placeholder="Опишите подробно: что нужно сделать, что упомянуть, ссылки, требования к тексту/видео..."></textarea></div>
+    <button class="btn btn-primary" style="width:100%;padding:12px" onclick="sendDeal()">Отправить предложение</button>
+  </div>
+</div>
+
+<!-- ══════════ MODAL: ADD EXCLUSIVE SERVICE ══════════ -->
+<div class="mo" id="mAddExcl">
+  <div class="modal">
+    <div class="mh">
+      <div><h2 style="font-size:20px;font-weight:800">🌟 Эксклюзивная услуга</h2><p style="font-size:13px;color:#888">Услуга, доступная только через нашу биржу</p></div>
+      <button class="mc" onclick="closeModal('mAddExcl')">×</button>
+    </div>
+    <div class="fg"><label class="fl">Название услуги *</label><input class="fi" type="text" id="exclName" placeholder="Например: Интеграция в подкаст BCS"></div>
+    <div class="fg"><label class="fl">Описание</label><textarea class="fi" id="exclDesc" rows="2" placeholder="Краткое описание формата и условий..."></textarea></div>
+    <div class="fg"><label class="fl">Привязать к блогеру (опционально)</label>
+      <select class="fi" id="exclBlogger">
+        <option value="">— Доступно всем подходящим блогерам —</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:12px">
+      <div class="fg" style="flex:1"><label class="fl">Стоимость (₽)</label><input class="fi" type="number" id="exclPrice" placeholder="50000" min="0"></div>
+      <div class="fg" style="flex:1"><label class="fl">Ставка комиссии (%)</label><input class="fi" type="number" id="exclComm" placeholder="10" min="0" max="50" step="0.5" value="10"></div>
+    </div>
+    <button class="btn btn-primary" style="width:100%;padding:12px" onclick="submitAddExclusiveService()">✓ Добавить эксклюзивную услугу</button>
+  </div>
+</div>
+
+<!-- ══════════ MODAL: APPLY TO CAMPAIGN ══════════ -->
+<div class="mo" id="mApply">
+  <div class="modal">
+    <div class="mh">
+      <div><h2 style="font-size:20px;font-weight:800">Откликнуться на кампанию</h2><p id="mApplyFor" style="font-size:14px;color:#888"></p></div>
+      <button class="mc" onclick="closeModal('mApply')">×</button>
+    </div>
+    <div class="fg">
+      <label class="fl">Через какую соцсеть выполню?</label>
+      <select class="fi" id="applySocial" onchange="filterApplyFormats(this.value)">
+        <option value="">— выберите платформу —</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label class="fl">Формат размещения</label>
+      <select class="fi" id="applyFormat">
+        <option value="">— выберите формат —</option>
+      </select>
+    </div>
+    <div class="fg"><label class="fl">Сопроводительное письмо</label><textarea class="fi" rows="3" id="applyCover" placeholder="Расскажите почему подходите для этой кампании..."></textarea></div>
+    <div style="background:#f0f4ff;border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:13px">
+      ℹ️ После принятия заявки эмитент пришлёт ТЗ и обсудит детали в чате.
+    </div>
+    <button class="btn btn-primary" style="width:100%;padding:12px" onclick="submitApply()">Отправить заявку</button>
+  </div>
+</div>
+
+<!-- ══════════ MODAL: USER DETAIL (ADMIN) ══════════ -->
+<div class="mo" id="mUser">
+  <div class="modal">
+    <div class="mh"><h2 style="font-size:20px;font-weight:800" id="mUserTitle">Пользователь</h2><button class="mc" onclick="closeModal('mUser')">×</button></div>
+    <div id="mUserBody"></div>
+  </div>
+</div>
+
+<!-- ══════════ MODAL: CAMPAIGN DETAIL ══════════ -->
+<div class="mo" id="mCampDetail">
+  <div class="modal modal-wide">
+    <div class="mh"><h2 style="font-size:20px;font-weight:800" id="mCampDetailTitle">Кампания</h2><button class="mc" onclick="closeModal('mCampDetail')">×</button></div>
+    <div id="mCampDetailBody"></div>
+  </div>
+</div>
+
+<!-- ══════════ MODAL: EARNINGS HISTORY ══════════ -->
+<div class="mo" id="mEarnings">
+  <div class="modal">
+    <div class="mh"><h2 style="font-size:20px;font-weight:800">💰 История заработка</h2><button class="mc" onclick="closeModal('mEarnings')">×</button></div>
+    <div class="sc-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px">
+      <div class="sc c2"><div class="v">₽30K</div><div class="l">Всего</div></div>
+      <div class="sc c1"><div class="v">3</div><div class="l">Сделок</div></div>
+      <div class="sc c4"><div class="v">₽10K</div><div class="l">Средняя</div></div>
+    </div>
+    <table class="tbl">
+      <thead><tr><th>Дата</th><th>Эмитент</th><th>Формат</th><th>Сумма</th><th>Статус</th></tr></thead>
+      <tbody>
+        <tr><td>20 янв 2026</td><td>BingX Exchange</td><td>Telegram пост</td><td style="font-weight:700;color:#16a34a">₽10 000</td><td><span class="b g">Выплачено</span></td></tr>
+        <tr><td>5 фев 2026</td><td>BingX Exchange</td><td>YouTube интеграция</td><td style="font-weight:700;color:#16a34a">₽20 000</td><td><span class="b g">Выплачено</span></td></tr>
+        <tr><td>20 фев 2026</td><td>BingX Exchange</td><td>Telegram пост</td><td style="font-weight:700;color:#d97706">₽10 000</td><td><span class="b y">В эскроу</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════ MODAL: COMPLETED DEALS ══════════ -->
+<div class="mo" id="mCompletedDeals">
+  <div class="modal">
+    <div class="mh"><h2 style="font-size:20px;font-weight:800">✅ Завершённые сделки</h2><button class="mc" onclick="closeModal('mCompletedDeals')">×</button></div>
+    <div class="deal-card" style="border-left-color:#16a34a">
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+        <div><div style="font-weight:700">BingX Exchange → YouTube интеграция</div><div style="font-size:12px;color:#888">Завершена 10 фев 2026</div></div>
+        <span class="b g">✓ Выплачено</span>
+      </div>
+      <div style="font-size:13px;color:#555">Гонорар: <b style="color:#16a34a">₽20 000</b></div>
+      <div style="margin-top:8px"><span class="b gr">★ 5.0 — оценка эмитента</span></div>
+    </div>
+    <div class="deal-card" style="border-left-color:#16a34a">
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+        <div><div style="font-weight:700">BingX Exchange → Telegram пост</div><div style="font-size:12px;color:#888">Завершена 25 янв 2026</div></div>
+        <span class="b g">✓ Выплачено</span>
+      </div>
+      <div style="font-size:13px;color:#555">Гонорар: <b style="color:#16a34a">₽10 000</b></div>
+      <div style="margin-top:8px"><span class="b gr">★ 4.5 — оценка эмитента</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ MODAL: OPEN DISPUTE ══════════ -->
+<div class="mo" id="mOpenDispute">
+  <div class="modal">
+    <div class="mh"><h2 style="font-size:20px;font-weight:800" id="mOpenDisputeTitle">Открыть спор</h2><button class="mc" onclick="closeModal('mOpenDispute')">×</button></div>
+    <div id="mOpenDisputeBody"></div>
+  </div>
+</div>
+
+<!-- ══════════ MODAL: DISPUTE DETAIL (ADMIN) ══════════ -->
+<div class="mo" id="mDisputeDetail">
+  <div class="modal modal-wide" style="max-width:700px">
+    <div class="mh"><h2 style="font-size:20px;font-weight:800" id="mDisputeTitle">Спор</h2><button class="mc" onclick="closeModal('mDisputeDetail')">×</button></div>
+    <div id="mDisputeBody" style="max-height:70vh;overflow-y:auto"></div>
+  </div>
+</div>
+
+<!-- ══════════ MODAL: ADMIN STAT DETAIL ══════════ -->
+<div class="mo" id="mAdminStat">
+  <div class="modal modal-wide" style="max-width:700px">
+    <div class="mh"><h2 style="font-size:20px;font-weight:800" id="mAdminStatTitle">Статистика</h2><button class="mc" onclick="closeModal('mAdminStat')">×</button></div>
+    <div id="mAdminStatBody" style="max-height:70vh;overflow-y:auto"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" style="position:fixed;bottom:24px;right:24px;background:#1a1a2e;color:#fff;padding:12px 20px;border-radius:12px;font-size:14px;font-weight:600;z-index:999;transform:translateY(80px);opacity:0;transition:.3s;max-width:320px;box-shadow:0 8px 24px rgba(0,0,0,.2)"></div>
+
+<script>
+// ═══════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════
+const PLATFORM_ICONS = {
+  'Telegram':'📱','YouTube':'▶️','VK':'🔷','Яндекс.Дзен':'🟡','Instagram':'📸','TikTok':'🎵','Twitter/X':'🐦'
+};
+
+const BLOGGERS = [
+  {id:1, n:'Крипто Блогер 1', niche:'крипто', geo:'Россия', tg:'@cryptoblogger1', r:4.3, deals:3,
+   tags:['крипто','биржи','DeFi','обзоры'],
+   s:[
+     {plat:'Telegram',link:'@cryptoblogger1',subs:15000,views:'8 000 просм.',er:'5.2%',verified:true},
+     {plat:'YouTube',link:'CryptoBlogger1',subs:25000,views:'12 000 просм.',er:'4.1%',verified:false},
+     {plat:'VK',link:'vk.com/cryptob1',subs:8000,views:'3 500 просм.',er:'2.1%',verified:false}
+   ],
+   p:[{n:'Пост в Telegram',d:'Нативный рекламный пост с ссылкой · 1 день',p:10000,plat:'Telegram'},
+      {n:'Интеграция в YouTube',d:'Рекламная интеграция 60-90 сек · 7 дней',p:20000,plat:'YouTube'},
+      {n:'YouTube Shorts',d:'Короткое видео с упоминанием · 3 дня',p:8000,plat:'YouTube'},
+      {n:'Пост в VK',d:'Текстовый пост с фото · 1 день',p:6000,plat:'VK'},
+      {n:'Спецпроект',d:'Индивидуальные условия — оговариваются отдельно',p:0,plat:'*'}]},
+  {id:2, n:'Инвест Блогер', niche:'инвестиции', geo:'Россия', tg:'@investblog2', r:4.4, deals:6,
+   tags:['инвестиции','акции','фонды','финансы'],
+   s:[
+     {plat:'Telegram',link:'@investblog2',subs:30000,views:'16 000 просм.',er:'5.2%',verified:true},
+     {plat:'YouTube',link:'InvestBlog2',subs:50000,views:'24 000 просм.',er:'4.1%',verified:true},
+     {plat:'Яндекс.Дзен',link:'zen.yandex.ru/investblog2',subs:12000,views:'5 000 просм.',er:'1.8%',verified:false}
+   ],
+   p:[{n:'Пост в Telegram',d:'Нативный пост с ссылкой',p:20000,plat:'Telegram'},
+      {n:'Интеграция в YouTube',d:'Интеграция 60-90 сек',p:40000,plat:'YouTube'},
+      {n:'Статья в Яндекс.Дзен',d:'Лонгрид с ссылками · 30 дней в ленте',p:15000,plat:'Яндекс.Дзен'},
+      {n:'Спецпроект',d:'Индивидуальные условия — оговариваются отдельно',p:0,plat:'*'}]},
+  {id:3, n:'DeFi Expert', niche:'DeFi', geo:'Россия', tg:'@defiexpert3', r:4.5, deals:9,
+   tags:['DeFi','Web3','NFT','блокчейн','крипто'],
+   s:[
+     {plat:'Telegram',link:'@defiexpert3',subs:45000,views:'24 000 просм.',er:'5.8%',verified:true},
+     {plat:'YouTube',link:'DeFiExpert3',subs:75000,views:'36 000 просм.',er:'4.5%',verified:true},
+     {plat:'Twitter/X',link:'@defiexpert3',subs:22000,views:'18 000 просм.',er:'3.2%',verified:false}
+   ],
+   p:[{n:'Пост в Telegram',d:'Нативный пост с ссылкой',p:30000,plat:'Telegram'},
+      {n:'Интеграция в YouTube',d:'Интеграция 60-90 сек',p:60000,plat:'YouTube'},
+      {n:'Тред в Twitter/X',d:'Информационный тред с ссылкой',p:18000,plat:'Twitter/X'},
+      {n:'Спецпроект',d:'Индивидуальные условия — оговариваются отдельно',p:0,plat:'*'}]}
+];
+
+const ALL_TAGS = ['крипто','биржи','DeFi','обзоры','инвестиции','акции','фонды','NFT','Web3','трейдинг','финансы','блокчейн','стейкинг','P2P'];
+
+// Кампании — разделены по эмитентам
+const CAMPAIGNS = {
+  issuer: [
+    {id:1, title:'BingX — Осенний набор блогеров', desc:'Ищем 10 крипто-блогеров для продвижения BingX Exchange. Рассказать про торговые пары, кешбэк, реф. программу. Ссылка с UTM.', niche:'крипто', budget:25000, count:10, deadline:'20 мар 2026', platform:'Telegram', status:'ACTIVE', applies:10},
+    {id:2, title:'BingX — YouTube-интеграции', desc:'Нужны 5 YouTube-блогеров с аудиторией 20K+ для обзора функции Copy Trading.', niche:'крипто', budget:60000, count:5, deadline:'15 апр 2026', platform:'YouTube', status:'DRAFT', applies:0}
+  ],
+  issuer2: []
+};
+
+// Верификации — мутабельное состояние
+const VERIFICATIONS = {
+  issuer2: {name:'InvestFund Alpha', email:'issuer2@test.ru', type:'FUND', date:'22 фев 2026', status:'pending'}
+};
+
+const ACCS = {
+  issuer:  {role:'ISSUER',  email:'issuer1@test.ru',  name:'BingX Exchange',   verified:true,  type:'CRYPTO_EXCHANGE', site:'https://bingx.com', sub:'BASE', r:4.7, deals:18},
+  issuer2: {role:'ISSUER',  email:'issuer2@test.ru',  name:'InvestFund Alpha', verified:false, type:'FUND', site:'https://investfund.ru', sub:'BASE', r:0, deals:0},
+  blogger: {role:'BLOGGER', email:'blogger1@test.ru', name:'Крипто Блогер 1'},
+  admin:   {role:'ADMIN',   email:'admin@adexchange.ru', name:'Администратор'}
+};
+
+const USERS_LIST = [
+  {email:'admin@adexchange.ru', role:'ADMIN', status:'active', name:'Администратор', date:'01 янв 2026', banned:false},
+  {email:'issuer1@test.ru', role:'ISSUER', status:'verified', name:'BingX Exchange', date:'10 янв 2026', banned:false},
+  {email:'issuer2@test.ru', role:'ISSUER', status:'pending', name:'InvestFund Alpha', date:'22 фев 2026', banned:false},
+  {email:'blogger1@test.ru', role:'BLOGGER', status:'active', name:'Крипто Блогер 1', date:'15 янв 2026', banned:false},
+  {email:'blogger2@test.ru', role:'BLOGGER', status:'active', name:'Инвест Блогер', date:'16 янв 2026', banned:false},
+  {email:'blogger3@test.ru', role:'BLOGGER', status:'active', name:'DeFi Expert', date:'17 янв 2026', banned:false}
+];
+
+// ═══════════════════════════════════════════════════
+// DISPUTES DATA
+// ═══════════════════════════════════════════════════
+const DISPUTES = [
+  {id:1, issuer:'BingX Exchange', issuerEmail:'issuer1@test.ru',
+   blogger:'Крипто Блогер 1', bloggerEmail:'blogger1@test.ru',
+   amount:10000, total:11000,
+   reason:'Блогер не разместил пост в срок. Дедлайн 1 марта, пост до сих пор не опубликован.',
+   status:'open', date:'3 мар 2026',
+   msgs:[
+     {from:'issuer', text:'Открываю спор — пост не опубликован в срок, дедлайн прошёл.', time:'3 мар, 10:15'},
+     {from:'blogger', text:'Прошу прощения, была задержка. Готов опубликовать сегодня.', time:'3 мар, 11:02'},
+     {from:'admin', text:'Принято к рассмотрению. Ожидайте решения в течение 48 часов.', time:'3 мар, 11:30'}
+   ]},
+  {id:2, issuer:'BingX Exchange', issuerEmail:'issuer1@test.ru',
+   blogger:'DeFi Expert', bloggerEmail:'blogger3@test.ru',
+   amount:30000, total:33000,
+   reason:'Некачественное размещение: не упомянуты ключевые тезисы из ТЗ, нет UTM-ссылки.',
+   status:'open', date:'1 мар 2026',
+   msgs:[
+     {from:'issuer', text:'Пост опубликован, но UTM-ссылка отсутствует и не упомянут кешбэк.', time:'1 мар, 14:00'},
+     {from:'blogger', text:'Исправлю пост, добавлю ссылку. Прошу не блокировать эскроу.', time:'1 мар, 15:20'},
+     {from:'admin', text:'Рассматриваем. Пожалуйста, предоставьте скриншоты обоих вариантов.', time:'1 мар, 16:00'}
+   ]}
+];
+
+// Теги блогера (мутабельные)
+let bloggerTags = ['крипто','биржи','DeFi','обзоры'];
+
+// Соцсети и прайс блогера (мутабельные)
+let bloggerSocials = [...BLOGGERS[0].s];
+let bloggerPrices = [...BLOGGERS[0].p];
+
+let CU = null, CB = null; // Current User, Current Blogger
+
+// ═══════════════════════════════════════════════════
+// NAV & LOGIN
+// ═══════════════════════════════════════════════════
+function quickLogin(type) {
+  const a = ACCS[type]; if (!a) return;
+  CU = {...a, accKey: type};
+  updateNav();
+  if (a.role === 'ISSUER') {
+    renderIssuerDashboard();
+    showPage('issuer');
+    iTab('dashboard', document.querySelector('#page-issuer .si'));
+  } else if (a.role === 'BLOGGER') {
+    document.getElementById('bTitle').textContent = 'Панель блогера';
+    document.getElementById('bName').textContent = a.name;
+    document.getElementById('bAvatar').textContent = a.name[0];
+    renderProfileTags();
+    renderSocials();
+    renderPrices();
+    renderBloggerCampaigns();
+    showPage('blogger');
+    bTab('dashboard', document.querySelector('#page-blogger .si'));
+  } else {
+    renderAdmin();
+    showPage('admin');
+    aTab('dashboard', document.querySelector('#page-admin .si'));
+  }
+}
+
+function doLogin() {
+  const e = document.getElementById('loginEmail').value;
+  const m = {'issuer1@test.ru':'issuer','issuer2@test.ru':'issuer2','blogger1@test.ru':'blogger','admin@adexchange.ru':'admin'};
+  if (m[e]) quickLogin(m[e]); else showToast('Аккаунт не найден', 1);
+}
+
+function logout() { CU = null; updateNav(); showPage('landing'); }
+
+function updateNav() {
+  const nr = document.getElementById('navRight');
+  nr.innerHTML = CU
+    ? `<span class="nav-user">${CU.email}</span><button class="btn btn-secondary btn-sm" onclick="logout()">Выйти</button>`
+    : `<button class="btn btn-secondary btn-sm" onclick="showPage('login')">Войти</button><button class="btn btn-primary btn-sm" onclick="showPage('login')">Регистрация</button>`;
+}
+
+function showPage(n) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const p = document.getElementById('page-' + n); if (p) p.classList.add('active');
+}
+
+// ═══════════════════════════════════════════════════
+// TAB SWITCHES
+// ═══════════════════════════════════════════════════
+function iTab(t, el) {
+  if ((t === 'catalog' || t === 'deals') && CU && !CU.verified) {
+    showToast('🔒 Этот раздел доступен только верифицированным аккаунтам. Ожидайте подтверждения.', 1);
+    return;
+  }
+  document.querySelectorAll('#page-issuer .tc').forEach(x => x.classList.remove('active'));
+  document.querySelectorAll('#page-issuer .si').forEach(x => x.classList.remove('active'));
+  const tc = document.getElementById('i-' + t); if (tc) tc.classList.add('active');
+  if (el) el.classList.add('active');
+  if (t === 'catalog') renderCatalog();
+  if (t === 'campaigns') renderIssuerCampaigns();
+  if (t === 'deals') renderIssuerDeals();
+}
+function bTab(t, el) {
+  document.querySelectorAll('#page-blogger .tc').forEach(x => x.classList.remove('active'));
+  document.querySelectorAll('#page-blogger .si').forEach(x => x.classList.remove('active'));
+  const tc = document.getElementById('b-' + t); if (tc) tc.classList.add('active');
+  if (el) el.classList.add('active');
+  if (t === 'profile') {
+    // bTab clears ALL .tc inside #page-blogger (including nested sub-tabs),
+    // so restore the default sub-tab pt-basic as active
+    const defSub = document.getElementById('pt-basic');
+    if (defSub) defSub.classList.add('active');
+    const defSubBtn = document.querySelector('#b-profile .tab');
+    if (defSubBtn) defSubBtn.classList.add('active');
+    renderProfileTags(); renderSocials(); renderPrices();
+  }
+}
+function aTab(t, el) {
+  document.querySelectorAll('#page-admin .tc').forEach(x => x.classList.remove('active'));
+  document.querySelectorAll('#page-admin .si').forEach(x => x.classList.remove('active'));
+  const tc = document.getElementById('a-' + t); if (tc) tc.classList.add('active');
+  if (el) el.classList.add('active');
+  if (t === 'dashboard') setTimeout(drawCharts, 60);
+  if (t === 'verify') renderVerifyTab();
+  if (t === 'users') renderUsersTab();
+  if (t === 'disputes') renderDisputesTab();
+  if (t === 'commissions') renderCommissionsTab();
+  if (t === 'tags') renderAdminTagsTab();
+}
+function pTab(t, el) {
+  document.querySelectorAll('#b-profile .tc').forEach(x => x.classList.remove('active'));
+  document.querySelectorAll('#b-profile .tab').forEach(x => x.classList.remove('active'));
+  const tc = document.getElementById('pt-' + t); if (tc) tc.classList.add('active');
+  if (el) el.classList.add('active');
+  if (t === 'basic')   renderProfileTags();
+  if (t === 'socials') renderSocials();
+  if (t === 'prices')  renderPrices();
+}
+
+// ═══════════════════════════════════════════════════
+// ISSUER
+// ═══════════════════════════════════════════════════
+function renderIssuerDashboard() {
+  const v = CU.verified;
+  document.getElementById('iTitle').textContent = 'Панель эмитента';
+  document.getElementById('iSub').textContent = CU.name;
+  document.getElementById('issuerBanner').style.display = v ? 'none' : 'flex';
+  document.getElementById('iStatTier').textContent = CU.sub || 'BASE';
+  document.getElementById('iStatStatus').textContent = v ? '✓ Верифицирован' : '⏳ На проверке';
+  const camps = CAMPAIGNS[CU.accKey] || [];
+  const activeCamps = camps.filter(c => c.status === 'ACTIVE');
+  document.getElementById('iStatCamp').textContent = activeCamps.length;
+  document.getElementById('iStatBudget').textContent = '₽' + activeCamps.reduce((s, c) => s + c.budget * c.count, 0).toLocaleString('ru');
+  // Dash campaigns
+  const dc = document.getElementById('iDashCampaigns');
+  if (camps.length === 0) dc.innerHTML = '<div class="es"><div class="es-icon">📢</div>Кампаний нет</div>';
+  else dc.innerHTML = camps.map(c => `
+    <div class="cc">
+      <div class="cc-title">${c.title}</div>
+      <div class="cc-desc">${c.desc.substring(0, 80)}...</div>
+      <div style="display:flex;gap:6px"><span class="b ${c.status==='ACTIVE'?'g':'gr'}">${c.status}</span><span class="b in">₽${c.budget.toLocaleString('ru')}</span><span class="b gr">${c.applies} откликов</span></div>
+    </div>`).join('');
+  document.getElementById('iDashDeals').innerHTML = '<div class="es"><div class="es-icon">📋</div>Нет активных сделок</div>';
+  renderIProfile();
+}
+
+function tryCreateCampaign() {
+  if (!CU.verified) {
+    showToast('❌ Создание кампаний доступно только верифицированным аккаунтам', 1);
+    return;
+  }
+  openModal('mCampaign');
+}
+
+function createCampaign() {
+  const name = document.getElementById('campName').value.trim();
+  const desc = document.getElementById('campDesc').value.trim();
+  const budget = parseInt(document.getElementById('campBudget').value) || 0;
+  if (!name || !desc || !budget) { showToast('Заполните все обязательные поля', 1); return; }
+  const newC = {
+    id: Date.now(), title: name, desc: desc,
+    niche: document.getElementById('campNiche').value,
+    budget: budget,
+    count: parseInt(document.getElementById('campCount').value) || 5,
+    deadline: document.getElementById('campDeadline').value || '01 апр 2026',
+    platform: document.getElementById('campPlatform').value,
+    status: 'ACTIVE', applies: 0
+  };
+  if (!CAMPAIGNS[CU.accKey]) CAMPAIGNS[CU.accKey] = [];
+  CAMPAIGNS[CU.accKey].push(newC);
+  closeModal('mCampaign');
+  showToast('✓ Кампания создана!');
+  renderIssuerDashboard();
+  iTab('campaigns', null);
+  document.querySelectorAll('#page-issuer .si').forEach((el, i) => { if (i === 2) el.classList.add('active'); else el.classList.remove('active'); });
+}
+
+function renderIssuerCampaigns() {
+  const camps = CAMPAIGNS[CU?.accKey] || [];
+  const el = document.getElementById('iCampaignsList');
+  if (camps.length === 0) { el.innerHTML = '<div class="es"><div class="es-icon">📢</div>Кампаний нет. Создайте первую!</div>'; return; }
+  el.innerHTML = camps.map(c => `
+    <div class="cc" style="cursor:pointer" onclick="openCampaignDetail(${c.id})">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px">
+        <div><div class="cc-title">${c.title}</div><span class="b ${c.status==='ACTIVE'?'g':'gr'}">${c.status}</span>&nbsp;<span class="b pu">${c.applies} откликов</span></div>
+        <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();editCampaign(${c.id})">✏️ Ред.</button>
+      </div>
+      <div class="cc-desc">${c.desc}</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <span class="b in">💰 ₽${c.budget.toLocaleString('ru')}</span>
+        <span class="b gr">👥 Нужно: ${c.count}</span>
+        <span class="b gr">📅 ${c.deadline}</span>
+        <span class="pl">${c.platform}</span>
+        <span class="pl">${c.niche}</span>
+      </div>
+    </div>`).join('');
+}
+
+function openCampaignDetail(id) {
+  const camps = CAMPAIGNS[CU?.accKey] || [];
+  const c = camps.find(x => x.id === id); if (!c) return;
+  document.getElementById('mCampDetailTitle').textContent = c.title;
+  document.getElementById('mCampDetailBody').innerHTML = `
+    <div class="sc-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px">
+      <div class="sc c1"><div class="v">${c.applies}</div><div class="l">Откликов</div></div>
+      <div class="sc c2"><div class="v">₽${c.budget.toLocaleString('ru')}</div><div class="l">Бюджет/блогер</div></div>
+      <div class="sc c4"><div class="v">${c.count}</div><div class="l">Нужно блогеров</div></div>
+    </div>
+    <div class="fg"><label class="fl">Описание</label><div style="font-size:14px;color:#555;line-height:1.6;padding:10px 14px;background:#f9f9fc;border-radius:8px">${c.desc}</div></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+      <span class="b ${c.status==='ACTIVE'?'g':'gr'}">${c.status}</span>
+      <span class="pl">${c.platform}</span><span class="pl">${c.niche}</span>
+      <span class="b gr">📅 до ${c.deadline}</span>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-primary btn-sm" onclick="editCampaign(${c.id});closeModal('mCampDetail')">✏️ Редактировать</button>
+      <button class="btn btn-danger btn-sm" onclick="showToast('Кампания приостановлена');closeModal('mCampDetail')">⏸ Приостановить</button>
+      <button class="btn btn-success btn-sm" onclick="completeCampaign(${c.id});closeModal('mCampDetail')">✅ Завершить кампанию</button>
+      <button class="btn btn-secondary btn-sm" onclick="closeModal('mCampDetail')">Закрыть</button>
+    </div>`;
+  openModal('mCampDetail');
+}
+
+function completeCampaign(id) {
+  const camps = CAMPAIGNS[CU?.accKey] || [];
+  const c = camps.find(x => x.id === id); if (!c) return;
+  c.status = 'COMPLETED';
+  showToast('✅ Кампания «' + c.title + '» завершена');
+  renderIssuerCampaigns();
+}
+
+function editCampaign(id) {
+  const camps = CAMPAIGNS[CU?.accKey] || [];
+  const c = camps.find(x => x.id === id); if (!c) return;
+  document.getElementById('campName').value = c.title;
+  document.getElementById('campDesc').value = c.desc;
+  document.getElementById('campBudget').value = c.budget;
+  document.getElementById('campCount').value = c.count;
+  openModal('mCampaign');
+}
+
+function renderIssuerDeals() {
+  document.getElementById('iDealsList').innerHTML = `
+    <div class="deal-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+        <div>
+          <div style="font-size:16px;font-weight:800">Крипто Блогер 1 → Telegram пост</div>
+          <div style="font-size:12px;color:#888;margin-top:3px">Создана: 20 фев 2026 · Дедлайн: 1 мар 2026</div>
+        </div>
+        <span class="b y">На рассмотрении</span>
+      </div>
+      <div style="background:#f0f4ff;border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:13px">
+        <div style="display:flex;justify-content:space-between"><span>Гонорар блогера:</span><span style="font-weight:700">₽10 000</span></div>
+        <div style="display:flex;justify-content:space-between;color:#888;margin-top:3px"><span>Комиссия платформы (+10%, мин.):</span><span>₽1 000</span></div>
+        <div style="display:flex;justify-content:space-between;font-weight:800;color:#6366f1;margin-top:6px;padding-top:6px;border-top:1px solid #e0e0f8"><span>Итого к оплате:</span><span>₽11 000</span></div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-success btn-sm" onclick="showToast('✓ Размещение подтверждено! Средства выплачены.')">✓ Подтвердить размещение</button>
+        <button class="btn btn-danger btn-sm" style="margin-left:auto" onclick="openDisputeModal(1)">⚠️ Открыть спор</button>
+      </div>
+    </div>
+    <div class="es" style="padding:20px"><div class="es-icon">🤝</div><div>Больше активных сделок нет</div><button class="btn btn-primary btn-sm" style="margin-top:14px" onclick="iTab('catalog', document.querySelectorAll('#page-issuer .si')[1])">Найти блогеров</button></div>`;
+}
+
+function renderIProfile() {
+  if (!CU) return;
+  document.getElementById('iProfileCard').innerHTML = `
+    <div style="display:flex;align-items:center;gap:20px;margin-bottom:20px">
+      <div style="position:relative;cursor:pointer" onclick="document.getElementById('iAvatarInput').click()" title="Нажмите для загрузки логотипа">
+        <div class="pa" id="iProfileAvatar">${CU.name[0]}</div>
+        <div style="position:absolute;bottom:-4px;right:-4px;width:22px;height:22px;background:#6366f1;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;border:2px solid #fff">✏️</div>
+      </div>
+      <input type="file" id="iAvatarInput" accept="image/*" style="display:none" onchange="previewIssuerAvatar(this)">
+      <div>
+        <div class="pn">${CU.name}</div>
+        <div class="ps">${CU.email}</div>
+        <div class="pb">${CU.verified ? '<span class="b g">✓ Верифицирован</span>' : '<span class="b y">⏳ На проверке</span>'}<span class="b in">${CU.type||'ISSUER'}</span></div>
+      </div>
+    </div>
+    <div class="fr"><div class="fg"><label class="fl">Название компании</label><input class="fi" value="${CU.name}"></div><div class="fg"><label class="fl">Сайт</label><input class="fi" value="${CU.site||''}"></div></div>
+    <div class="fg"><label class="fl">Описание</label><textarea class="fi" rows="2" placeholder="Описание компании..."></textarea></div>
+    <button class="btn btn-primary" onclick="showToast('Профиль сохранён!')">Сохранить</button>`;
+}
+
+function activatePro() {
+  showToast('💳 Переход к оплате... (подключение платёжки в production-версии)');
+}
+
+// ═══════════════════════════════════════════════════
+// CATALOG
+// ═══════════════════════════════════════════════════
+function renderCatalog() {
+  const nf = document.getElementById('catFilterNiche')?.value || '';
+  const pf = document.getElementById('catFilterPlat')?.value || '';
+  const sort = document.getElementById('catSort')?.value || 'rating';
+  let list = [...BLOGGERS];
+  if (nf) list = list.filter(b => b.niche.toLowerCase().includes(nf.toLowerCase()));
+  if (pf) list = list.filter(b => b.s.some(s => s.plat === pf));
+  if (sort === 'rating') list.sort((a,b) => b.r - a.r);
+  else if (sort === 'price_asc') list.sort((a,b) => Math.min(...a.p.map(p=>p.p)) - Math.min(...b.p.map(p=>p.p)));
+  else if (sort === 'price_desc') list.sort((a,b) => Math.min(...b.p.map(p=>p.p)) - Math.min(...a.p.map(p=>p.p)));
+  else if (sort === 'subs') list.sort((a,b) => Math.max(...b.s.map(s=>s.subs)) - Math.max(...a.s.map(s=>s.subs)));
+  const g = document.getElementById('catalogGrid');
+  const empty = document.getElementById('catalogEmpty');
+  if (list.length === 0) { g.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+  g.innerHTML = list.map(b => `
+    <div class="bc" onclick="openBlogger(${b.id})">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between">
+        <div class="bc-av">${b.n[0]}</div>
+        <div style="font-size:16px;font-weight:800;color:#ca8a04">★ ${b.r}</div>
+      </div>
+      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:2px">
+        <div style="font-size:16px;font-weight:700">${b.n}</div>
+        <span class="b gr" style="font-size:11px">✅ ${b.deals} сделок</span>
+      </div>
+      <div style="font-size:12px;color:#888;margin-bottom:8px">${b.niche} · ${b.geo}</div>
+      <div style="margin-bottom:8px">${b.s.map(s=>`<div style="font-size:12px;color:#666;margin-bottom:2px">${PLATFORM_ICONS[s.plat]||'📡'} ${s.plat}: ${(s.subs/1000).toFixed(0)}K подп.</div>`).join('')}</div>
+      <div style="margin-bottom:10px">${b.tags.slice(0,3).map(t=>`<span class="pl">${t}</span>`).join('')}</div>
+      <div style="background:#eef2ff;color:#6366f1;border-radius:8px;padding:6px 10px;font-size:13px;font-weight:700;display:inline-block;margin-bottom:10px">от ₽${Math.min(...b.p.map(p=>p.p)).toLocaleString('ru')}</div>
+      <button class="btn btn-primary" style="width:100%">Предложить сделку</button>
+    </div>`).join('');
+}
+
+function openBlogger(id) {
+  const b = BLOGGERS.find(x => x.id === id); if (!b) return;
+  CB = b;
+  document.getElementById('mBName').textContent = b.n;
+  document.getElementById('mBSub').textContent = b.niche + ' · ' + b.geo + ' · ' + b.tg + ' · ★ ' + b.r;
+  document.getElementById('mBBody').innerHTML = `
+    <div class="g2" style="margin-bottom:16px">
+      ${b.s.map(s=>`<div class="soc"><div class="soc-icon">${PLATFORM_ICONS[s.plat]||'📡'}</div><div><div style="font-size:13px;font-weight:700">${s.plat}</div><div style="font-size:12px;color:#888">${(s.subs/1000).toFixed(0)}K подп. · ${s.views} · ER ${s.er}${s.verified?' · <span style="color:#16a34a">✓</span>':''}</div></div></div>`).join('')}
+    </div>
+    <div style="margin-bottom:16px">
+      <div style="font-size:14px;font-weight:700;margin-bottom:8px">Теги</div>
+      ${b.tags.map(t=>`<span class="tag active" style="cursor:default">${t}</span>`).join(' ')}
+    </div>
+    <div>
+      <div style="font-size:14px;font-weight:700;margin-bottom:10px">Прайс-лист</div>
+      ${b.p.map((p,si)=>{const rate=CUSTOM_COMMISSIONS['b'+b.id+'_s'+si]??CUSTOM_COMMISSIONS[b.id]??COMMISSION;const comm=Math.round(p.p*rate);const total=p.p+comm;const pct=Math.round(rate*100);return`<div class="pli"><div><div class="pli-n">${p.n}</div><div class="pli-d">${p.d}</div></div><div style="text-align:right"><div class="pli-p">₽${p.p.toLocaleString('ru')}</div><div style="font-size:11px;color:#888">+₽${comm.toLocaleString('ru')} комиссия (${pct}%)</div><div style="font-size:12px;font-weight:700;color:#6366f1">= ₽${total.toLocaleString('ru')} итого</div></div></div>`}).join('')}
+    </div>`;
+  openModal('mBlogger');
+}
+
+function openDealModal() {
+  if (!CB) return;
+  document.getElementById('mDealFor').textContent = '→ ' + CB.n;
+  // Populate social select first
+  const ss = document.getElementById('dealSocial');
+  ss.innerHTML = '<option value="">— выберите платформу —</option>' + CB.s.map(s=>`<option value="${s.plat}">${PLATFORM_ICONS[s.plat]||''} ${s.plat} (${(s.subs/1000).toFixed(0)}K подп.)</option>`).join('');
+  // Show all formats initially (filtered after platform picked)
+  filterDealFormats('');
+  document.getElementById('dealAmt').value = '';
+  document.getElementById('commBox').style.display = 'none';
+  const sph = document.getElementById('specProjHint'); if (sph) sph.style.display = 'none';
+  document.getElementById('dealTZ').value = '';
+  CB_SI = null;
+  openModal('mDeal');
+}
+
+function filterDealFormats(plat) {
+  if (!CB) return;
+  const fs = document.getElementById('dealFormat');
+  const filtered = CB.p.filter((p,si) => !plat || p.plat === plat || p.plat === '*');
+  if (filtered.length === 0) {
+    fs.innerHTML = '<option value="">— нет форматов для этой платформы —</option>';
+    return;
+  }
+  fs.innerHTML = '<option value="">— выберите формат —</option>' + filtered.map(p => {
+    const si = CB.p.indexOf(p);
+    const price = p.p > 0 ? '₽' + p.p.toLocaleString('ru') : 'по запросу';
+    return `<option value="${p.p}" data-si="${si}">${p.n} — ${price}</option>`;
+  }).join('');
+  document.getElementById('dealAmt').value = '';
+  document.getElementById('commBox').style.display = 'none';
+  CB_SI = null;
+}
+
+let CB_SI = null; // Current blogger service index for commission calc
+function setDealFormat() {
+  const sel = document.getElementById('dealFormat');
+  const v = sel.value;
+  const opt = sel.selectedOptions[0];
+  CB_SI = parseInt(opt?.dataset?.si ?? '-1');
+  const isSpec = opt?.text?.includes('Спецпроект') || false;
+  const hint = document.getElementById('specProjHint');
+  if (hint) hint.style.display = isSpec ? 'block' : 'none';
+  if (v === '0' || v === '') {
+    // Спецпроект или пустой — очистить сумму, ждать ручного ввода
+    document.getElementById('dealAmt').value = '';
+    document.getElementById('commBox').style.display = 'none';
+  } else {
+    document.getElementById('dealAmt').value = v;
+    calcComm();
+  }
+}
+
+function sendDeal() {
+  const amt = parseFloat(document.getElementById('dealAmt').value);
+  const tz = document.getElementById('dealTZ').value.trim();
+  const soc = document.getElementById('dealSocial').value;
+  if (!amt || !tz || !soc) { showToast('Заполните все поля и выберите соцсеть', 1); return; }
+  showToast('✓ Предложение отправлено блогеру!');
+  closeModal('mDeal');
+}
+
+// ═══════════════════════════════════════════════════
+// BLOGGER
+// ═══════════════════════════════════════════════════
+function renderProfileTags() {
+  const w = document.getElementById('profileTags'); if (!w) return;
+  w.innerHTML = ALL_TAGS.map(t => `<span class="tag ${bloggerTags.includes(t)?'active':''}" onclick="toggleTag('${t}',this)">${t}</span>`).join('');
+}
+
+function toggleTag(t, el) {
+  if (bloggerTags.includes(t)) {
+    bloggerTags = bloggerTags.filter(x => x !== t);
+    el.classList.remove('active');
+  } else if (bloggerTags.length < 8) {
+    bloggerTags.push(t);
+    el.classList.add('active');
+  } else {
+    showToast('Максимум 8 тегов', 1);
+  }
+}
+
+function previewBloggerAvatar(input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const av = document.getElementById('bAvatar');
+    av.style.background = 'none';
+    av.style.padding = '0';
+    av.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;border-radius:16px">`;
+    showToast('✓ Фото профиля обновлено!');
+  };
+  reader.readAsDataURL(file);
+}
+
+function previewIssuerAvatar(input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const av = document.getElementById('iProfileAvatar');
+    if (av) {
+      av.style.background = 'none';
+      av.style.padding = '0';
+      av.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;border-radius:16px">`;
+    }
+    showToast('✓ Фото компании обновлено!');
+  };
+  reader.readAsDataURL(file);
+}
+
+function openDisputeModal(dealId) {
+  const d = DISPUTES.find(x => x.id === dealId) || DISPUTES[0];
+  document.getElementById('mOpenDisputeTitle').textContent = 'Спор: ' + (d ? d.blogger + ' ↔ ' + d.issuer : 'Новый спор');
+  document.getElementById('mOpenDisputeBody').innerHTML = `
+    <div class="vb" style="margin-bottom:16px"><div class="vb-icon">⚠️</div>
+    <div><h4>Открытие спора</h4><p>Эскроу-средства будут заморожены до решения администратора. Обычно 2–3 рабочих дня.</p></div></div>
+    <div class="fg"><label class="fl">Причина спора *</label>
+    <select class="fi" id="disputeReason">
+      <option>Не выполнено в срок</option><option>Некачественное размещение</option>
+      <option>Нарушение ТЗ</option><option>Отказ от сделки</option><option>Другое</option>
+    </select></div>
+    <div class="fg"><label class="fl">Подробное описание *</label>
+    <textarea class="fi" rows="3" id="disputeDesc" placeholder="Опишите ситуацию подробно..."></textarea></div>
+    <div class="fg"><label class="fl">Желаемое решение</label>
+    <select class="fi"><option>Полный возврат средств</option><option>Частичная компенсация</option><option>Повторное размещение</option></select></div>
+    <button class="btn btn-danger" style="width:100%;padding:12px" onclick="submitDispute()">⚠️ Открыть спор</button>`;
+  openModal('mOpenDispute');
+}
+
+function submitDispute() {
+  const desc = document.getElementById('disputeDesc')?.value.trim();
+  if (!desc) { showToast('Опишите ситуацию', 1); return; }
+  showToast('⚠️ Спор открыт! Администратор рассмотрит в течение 48 часов.');
+  closeModal('mOpenDispute');
+}
+
+function saveProfile() {
+  const name = document.getElementById('bInputName').value;
+  const niche = document.getElementById('bInputNiche').value;
+  document.getElementById('bName').textContent = name;
+  document.getElementById('bNicheGeo').textContent = niche + ' · Россия · @cryptoblogger1';
+  document.getElementById('bAvatar').textContent = name[0];
+  showToast('✓ Профиль сохранён!');
+}
+
+function renderSocials() {
+  const el = document.getElementById('socialsList'); if (!el) return;
+  el.innerHTML = bloggerSocials.map((s, i) => `
+    <div class="soc">
+      <div class="soc-icon">${PLATFORM_ICONS[s.plat]||'📡'}</div>
+      <div style="flex:1">
+        <div style="font-size:14px;font-weight:600">${s.plat} — ${s.link}</div>
+        <div style="font-size:12px;color:#888">${(s.subs/1000).toFixed(0)}K подп. · ${s.views} · ER ${s.er}${s.verified?' · <span style="color:#16a34a">✓ Верифицирован</span>':''}</div>
+      </div>
+      <button class="btn btn-danger btn-sm" onclick="removeSocial(${i})" style="flex-shrink:0">✕</button>
+    </div>`).join('');
+}
+
+function addSocial() {
+  const plat = document.getElementById('addSocPlatform').value;
+  const link = document.getElementById('addSocLink').value.trim();
+  const subs = parseInt(document.getElementById('addSocSubs').value) || 0;
+  const views = document.getElementById('addSocViews').value.trim() || '—';
+  if (!link) { showToast('Введите ссылку', 1); return; }
+  bloggerSocials.push({plat, link, subs, views, er:'—', verified:false});
+  document.getElementById('addSocLink').value = '';
+  document.getElementById('addSocSubs').value = '';
+  document.getElementById('addSocViews').value = '';
+  renderSocials();
+  showToast(`✓ ${plat} добавлен!`);
+}
+
+function removeSocial(i) {
+  bloggerSocials.splice(i, 1);
+  renderSocials();
+  showToast('Соцсеть удалена');
+}
+
+function renderPrices() {
+  const el = document.getElementById('pricesList'); if (!el) return;
+  el.innerHTML = bloggerPrices.map((p, i) => `
+    <div class="pli">
+      <div><div class="pli-n">${p.n}</div><div class="pli-d">${p.d}</div></div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="pli-p">${p.p > 0 ? '₽' + p.p.toLocaleString('ru') : '<span style="color:#6366f1;font-size:13px">по запросу</span>'}</div>
+        <button class="btn btn-danger btn-sm" onclick="removePrice(${i})">✕</button>
+      </div>
+    </div>`).join('');
+}
+
+function addPrice() {
+  const name = document.getElementById('addPriceName').value.trim();
+  const val = parseInt(document.getElementById('addPriceVal').value) || 0;
+  const desc = document.getElementById('addPriceDesc').value.trim();
+  if (!name || !val) { showToast('Введите название и цену', 1); return; }
+  bloggerPrices.push({n: name, d: desc || 'Формат размещения', p: val});
+  document.getElementById('addPriceName').value = '';
+  document.getElementById('addPriceVal').value = '';
+  document.getElementById('addPriceDesc').value = '';
+  renderPrices();
+  showToast('✓ Формат добавлен!');
+}
+
+function removePrice(i) {
+  bloggerPrices.splice(i, 1);
+  renderPrices();
+}
+
+function renderBloggerCampaigns() {
+  const nf = document.getElementById('bCampFilterNiche')?.value || '';
+  const pf = document.getElementById('bCampFilterPlat')?.value || '';
+  const sort = document.getElementById('bCampSort')?.value || 'budget_desc';
+  // Все кампании всех эмитентов
+  let all = Object.entries(CAMPAIGNS).flatMap(([key, camps]) =>
+    camps.filter(c => c.status === 'ACTIVE').map(c => ({...c, issuerKey: key, issuerName: ACCS[key]?.name || key, issuerR: ACCS[key]?.r || 0, issuerDeals: ACCS[key]?.deals || 0}))
+  );
+  if (nf) all = all.filter(c => c.niche.toLowerCase().includes(nf.toLowerCase()));
+  if (pf) all = all.filter(c => c.platform === pf || c.platform === 'Любая');
+  if (sort === 'budget_desc') all.sort((a, b) => b.budget - a.budget);
+  else if (sort === 'budget_asc') all.sort((a, b) => a.budget - b.budget);
+  const el = document.getElementById('bCampaignsList');
+  if (all.length === 0) { el.innerHTML = '<div class="es"><div class="es-icon">📢</div>Нет доступных кампаний по фильтрам</div>'; return; }
+  el.innerHTML = all.map(c => `
+    <div class="cc">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px">
+        <div>
+          <div class="cc-title">${c.title}</div>
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:4px">
+            <span class="b g">ACTIVE</span>
+            <span class="b in" style="font-size:11px">${c.issuerName}</span>
+            ${c.issuerR > 0 ? `<span class="b" style="background:#fef9c3;color:#ca8a04;font-size:11px">★ ${c.issuerR}</span>` : ''}
+            ${c.issuerDeals > 0 ? `<span class="b gr" style="font-size:11px">✅ ${c.issuerDeals} сделок</span>` : ''}
+          </div>
+        </div>
+        <div style="text-align:right"><div style="font-size:22px;font-weight:800;color:#6366f1">₽${c.budget.toLocaleString('ru')}</div><div style="font-size:11px;color:#aaa">за размещение</div></div>
+      </div>
+      <div class="cc-desc">${c.desc}</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <div><span class="pl">${c.platform}</span><span class="pl">${c.niche}</span><span class="b gr" style="margin:2px">👥 ${c.count} мест</span><span class="b gr" style="margin:2px">📅 до ${c.deadline}</span></div>
+        <button class="btn btn-primary btn-sm" onclick="openApplyModal(${c.id}, '${c.title.replace(/'/g,"\\'")}')">Откликнуться</button>
+      </div>
+    </div>`).join('');
+}
+
+function filterApplyFormats(plat) {
+  const fs = document.getElementById('applyFormat');
+  const filtered = bloggerPrices.filter(p => !plat || !p.plat || p.plat === plat || p.plat === '*');
+  fs.innerHTML = '<option value="">— выберите формат —</option>' + filtered.map(p => {
+    const price = p.p > 0 ? '₽' + p.p.toLocaleString('ru') : 'по запросу';
+    return `<option value="${p.p}">${p.n} — ${price}</option>`;
+  }).join('');
+}
+
+function openApplyModal(campId, campTitle) {
+  document.getElementById('mApplyFor').textContent = '→ ' + campTitle;
+  const ss = document.getElementById('applySocial');
+  ss.innerHTML = '<option value="">— выберите платформу —</option>' + bloggerSocials.map(s=>`<option value="${s.plat}">${PLATFORM_ICONS[s.plat]||''} ${s.plat} (${(s.subs/1000).toFixed(0)}K подп.)</option>`).join('');
+  filterApplyFormats('');
+  document.getElementById('applyCover').value = '';
+  openModal('mApply');
+}
+
+function submitApply() {
+  const soc = document.getElementById('applySocial').value;
+  const fmt = document.getElementById('applyFormat').value;
+  if (!soc || !fmt) { showToast('Выберите соцсеть и формат', 1); return; }
+  showToast('✓ Заявка отправлена! Эмитент рассмотрит её.');
+  closeModal('mApply');
+}
+
+let chatAttachments = [];
+
+function attachChatFile(input) {
+  const file = input.files[0]; if (!file) return;
+  const ICONS = {doc:'📄',docx:'📄',pptx:'📊',pdf:'📕',xlsx:'📗',png:'🖼',jpg:'🖼',jpeg:'🖼'};
+  const ext = file.name.split('.').pop().toLowerCase();
+  const icon = ICONS[ext] || '📎';
+  chatAttachments.push({name: file.name, ext, icon});
+  const chips = document.getElementById('chatAttachChips');
+  chips.style.display = 'flex';
+  chips.innerHTML = chatAttachments.map((f,i) => 
+    `<span style="display:inline-flex;align-items:center;gap:4px;background:#eef2ff;color:#4338ca;border-radius:6px;padding:3px 8px;font-size:12px;font-weight:600">
+      ${f.icon} ${f.name}
+      <button onclick="removeChatAttach(${i})" style="background:none;border:none;cursor:pointer;color:#6366f1;font-size:14px;line-height:1;padding:0 2px">×</button>
+    </span>`).join('');
+  input.value = '';
+}
+
+function removeChatAttach(i) {
+  chatAttachments.splice(i, 1);
+  const chips = document.getElementById('chatAttachChips');
+  if (chatAttachments.length === 0) { chips.style.display = 'none'; chips.innerHTML = ''; return; }
+  chips.innerHTML = chatAttachments.map((f,idx) => 
+    `<span style="display:inline-flex;align-items:center;gap:4px;background:#eef2ff;color:#4338ca;border-radius:6px;padding:3px 8px;font-size:12px;font-weight:600">
+      ${f.icon} ${f.name}
+      <button onclick="removeChatAttach(${idx})" style="background:none;border:none;cursor:pointer;color:#6366f1;font-size:14px;line-height:1;padding:0 2px">×</button>
+    </span>`).join('');
+}
+
+function sendChatMsg() {
+  const inp = document.getElementById('chatInput');
+  const msgs = document.getElementById('dealChatMsgs');
+  const msg = inp.value.trim();
+  if (!msg && chatAttachments.length === 0) return;
+  const d = new Date();
+  const time = d.getHours() + ':' + String(d.getMinutes()).padStart(2,'0');
+  let content = msg ? msg.replace(/</g,'&lt;').replace(/>/g,'&gt;') : '';
+  if (chatAttachments.length > 0) {
+    const fileHtml = chatAttachments.map(f =>
+      `<div onclick="mockDownload('${f.name}')" style="display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.2);border-radius:6px;padding:4px 8px;margin-top:4px;cursor:pointer;font-size:12px;font-weight:600;border:1px solid rgba(255,255,255,.3)" title="Нажмите для скачивания">📎 ${f.name}</div>`
+    ).join('');
+    content = (content ? content + '<br>' : '') + fileHtml;
+    chatAttachments = [];
+    const chips = document.getElementById('chatAttachChips');
+    chips.style.display = 'none'; chips.innerHTML = '';
+  }
+  if (!content) return;
+  msgs.innerHTML += `<div class="chat-msg out">${content}<div class="msg-time">${time}</div></div>`;
+  msgs.scrollTop = msgs.scrollHeight;
+  inp.value = '';
+}
+
+function mockDownload(filename) {
+  showToast('📥 Скачивание: ' + filename);
+}
+
+// ═══════════════════════════════════════════════════
+// COMMISSION CALCULATOR (blogger price + 10% min)
+// ═══════════════════════════════════════════════════
+let COMMISSION = 0.10;
+// Индивидуальные комиссии: {bloggerId: rate} — override глобальной ставки
+// Ключи: id блогера (1,2,3) или 'service_<name>' для эксклюзивных услуг
+const CUSTOM_COMMISSIONS = {};
+
+// Эксклюзивные услуги платформы — мутабельный массив
+let EXCLUSIVE_SERVICES = [
+  {key:'investfuture_review', name:'InvestFuture: Обзор продукта', desc:'Эксклюзивно — только через нашу биржу. Блогеры с аудиторией 50K+.', comm:0.07, price:50000, bloggerId:null, bloggerName:null},
+  {key:'bcs_podcast', name:'BCS: Интеграция в подкаст', desc:'Эксклюзивный формат для клиентов БКС Брокер.', comm:0.06, price:35000, bloggerId:null, bloggerName:null}
+];
+
+function calcComm() {
+  const v = parseFloat(document.getElementById('dealAmt').value);
+  const b = document.getElementById('commBox');
+  if (!v || v <= 0) { b.style.display = 'none'; return; }
+  b.style.display = 'block';
+  const svcKey = (CB && CB_SI !== null && CB_SI >= 0) ? 'b'+CB.id+'_s'+CB_SI : null;
+  const rate = (svcKey && CUSTOM_COMMISSIONS[svcKey] !== undefined)
+    ? CUSTOM_COMMISSIONS[svcKey]
+    : (CB ? (CUSTOM_COMMISSIONS[CB.id] ?? COMMISSION) : COMMISSION);
+  const comm = Math.round(v * rate);
+  const total = v + comm;
+  const pct = Math.round(rate * 100);
+  document.getElementById('c-blogger').textContent = '₽' + v.toLocaleString('ru');
+  document.getElementById('c-comm').textContent = '+₽' + comm.toLocaleString('ru') + ' (' + pct + '%)';
+  document.getElementById('c-total').textContent = '₽' + total.toLocaleString('ru');
+}
+
+// ═══════════════════════════════════════════════════
+// ADMIN
+// ═══════════════════════════════════════════════════
+function renderAdmin() {
+  const pendingCount = Object.values(VERIFICATIONS).filter(v => v.status === 'pending').length;
+  const badge = document.getElementById('verifyBadgeSidebar');
+  if (badge) badge.textContent = pendingCount > 0 ? pendingCount : '';
+  document.getElementById('aStatUsers').textContent = USERS_LIST.filter(u => !u.banned).length;
+  renderAdminVerifyQueue();
+  setTimeout(drawCharts, 100);
+}
+
+function renderAdminVerifyQueue() {
+  const el = document.getElementById('adminVerifyQueue'); if (!el) return;
+  const pending = Object.entries(VERIFICATIONS).filter(([k, v]) => v.status === 'pending');
+  if (pending.length === 0) { el.innerHTML = '<div class="es" style="padding:20px">Очередь пуста ✓</div>'; return; }
+  el.innerHTML = pending.map(([key, v]) => `
+    <div style="display:flex;align-items:center;gap:12px;padding:12px;background:#f9f9fc;border-radius:10px;margin-bottom:8px">
+      <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#a855f7);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;flex-shrink:0">${v.name[0]}${v.name.split(' ')[1]?.[0]||''}</div>
+      <div style="flex:1"><div style="font-size:13px;font-weight:700">${v.name}</div><div style="font-size:12px;color:#888">${v.email} · ${v.type}</div></div>
+      <button class="btn btn-success btn-sm" onclick="verifyIssuer('${key}', true)">✓</button>
+      <button class="btn btn-danger btn-sm" onclick="verifyIssuer('${key}', false)">✗</button>
+    </div>`).join('');
+}
+
+function renderVerifyTab() {
+  const el = document.getElementById('aVerifyCard'); if (!el) return;
+  const pending = Object.entries(VERIFICATIONS).filter(([k, v]) => v.status === 'pending');
+  if (pending.length === 0) {
+    el.innerHTML = '<div class="es"><div class="es-icon">✅</div>Все эмитенты обработаны</div>';
+    return;
+  }
+  el.innerHTML = `<table class="tbl"><thead><tr><th>Компания</th><th>Email</th><th>Тип</th><th>Дата</th><th>Действия</th></tr></thead><tbody>` +
+    pending.map(([key, v]) => `<tr>
+      <td><b>${v.name}</b></td>
+      <td>${v.email}</td>
+      <td><span class="b bl">${v.type}</span></td>
+      <td>${v.date}</td>
+      <td style="display:flex;gap:8px">
+        <button class="btn btn-success btn-sm" onclick="verifyIssuer('${key}', true)">Одобрить</button>
+        <button class="btn btn-danger btn-sm" onclick="verifyIssuer('${key}', false)">Отклонить</button>
+      </td>
+    </tr>`).join('') + '</tbody></table>';
+}
+
+function verifyIssuer(key, approved) {
+  const v = VERIFICATIONS[key]; if (!v) return;
+  if (approved) {
+    v.status = 'approved';
+    ACCS[key].verified = true;
+    const u = USERS_LIST.find(u => u.email === v.email);
+    if (u) u.status = 'verified';
+    showToast(`✓ ${v.name} верифицирован!`);
+  } else {
+    v.status = 'rejected';
+    showToast(`✗ ${v.name} отклонён`);
+  }
+  renderAdmin();
+  renderVerifyTab();
+  renderUsersTab();
+  // Обновляем бейдж
+  const pendingCount = Object.values(VERIFICATIONS).filter(v => v.status === 'pending').length;
+  const badge = document.getElementById('verifyBadgeSidebar');
+  if (badge) badge.textContent = pendingCount > 0 ? pendingCount : '';
+}
+
+function renderUsersTab() {
+  const el = document.getElementById('aUsersList'); if (!el) return;
+  el.innerHTML = USERS_LIST.map((u, i) => {
+    const roleColor = u.role==='ADMIN'?'r':u.role==='ISSUER'?'in':'pu';
+    const statusLabel = u.banned ? '<span class="b r">Заблокирован</span>' : u.status==='verified' ? '<span class="b g">Верифицирован</span>' : u.status==='pending' ? '<span class="b y">На проверке</span>' : '<span class="b g">Активен</span>';
+    const avaColor = u.role==='ADMIN'?'#dc2626':u.role==='ISSUER'?'#6366f1':'#a855f7';
+    return `<div class="user-row" onclick="openUserDetail(${i})">
+      <div class="user-ava" style="background:${avaColor}">${u.name[0]}</div>
+      <div style="flex:1">
+        <div style="font-size:14px;font-weight:700">${u.name}</div>
+        <div style="font-size:12px;color:#888">${u.email}</div>
+      </div>
+      <span class="b ${roleColor}" style="margin-right:8px">${u.role}</span>
+      ${statusLabel}
+      <div style="font-size:12px;color:#aaa;margin-left:12px">${u.date}</div>
+    </div>`;
+  }).join('');
+}
+
+function openUserDetail(i) {
+  const u = USERS_LIST[i];
+  document.getElementById('mUserTitle').textContent = u.name;
+  const stats = u.role === 'ISSUER' ? `
+    <div class="sc-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px">
+      <div class="sc c1"><div class="v">1</div><div class="l">Кампаний</div></div>
+      <div class="sc c2"><div class="v">₽0</div><div class="l">Объём сделок</div></div>
+      <div class="sc c4"><div class="v">0</div><div class="l">Завершённых</div></div>
+    </div>` : u.role === 'BLOGGER' ? `
+    <div class="sc-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px">
+      <div class="sc c3"><div class="v">★ 4.3</div><div class="l">Рейтинг</div></div>
+      <div class="sc c2"><div class="v">₽30K</div><div class="l">Заработано</div></div>
+      <div class="sc c1"><div class="v">3</div><div class="l">Сделок</div></div>
+    </div>` : '';
+  document.getElementById('mUserBody').innerHTML = `
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;padding:16px;background:#f9f9fc;border-radius:12px">
+      <div class="user-ava" style="width:52px;height:52px;font-size:18px;background:${u.role==='ADMIN'?'#dc2626':u.role==='ISSUER'?'#6366f1':'#a855f7'}">${u.name[0]}</div>
+      <div>
+        <div style="font-size:18px;font-weight:800">${u.name}</div>
+        <div style="font-size:13px;color:#888">${u.email} · зарегистрирован ${u.date}</div>
+      </div>
+    </div>
+    ${stats}
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      ${!u.banned && u.role !== 'ADMIN' ? `<button class="btn btn-danger btn-sm" onclick="banUser(${i})">🚫 Заблокировать</button>` : ''}
+      ${u.banned ? `<button class="btn btn-success btn-sm" onclick="unbanUser(${i})">✓ Разблокировать</button>` : ''}
+      ${u.status === 'pending' && u.role === 'ISSUER' ? `<button class="btn btn-success btn-sm" onclick="verifyFromUserModal('${u.email}')">✓ Верифицировать</button>` : ''}
+      <button class="btn btn-warning btn-sm" onclick="showToast('📧 Письмо отправлено ${u.email}')">📧 Написать</button>
+      <button class="btn btn-secondary btn-sm" onclick="closeModal('mUser')">Закрыть</button>
+    </div>`;
+  openModal('mUser');
+}
+
+function banUser(i) {
+  USERS_LIST[i].banned = true;
+  USERS_LIST[i].status = 'banned';
+  showToast(`🚫 ${USERS_LIST[i].name} заблокирован`);
+  closeModal('mUser');
+  renderUsersTab();
+  document.getElementById('aStatUsers').textContent = USERS_LIST.filter(u => !u.banned).length;
+}
+
+function unbanUser(i) {
+  USERS_LIST[i].banned = false;
+  USERS_LIST[i].status = 'active';
+  showToast(`✓ ${USERS_LIST[i].name} разблокирован`);
+  closeModal('mUser');
+  renderUsersTab();
+  document.getElementById('aStatUsers').textContent = USERS_LIST.filter(u => !u.banned).length;
+}
+
+function verifyFromUserModal(email) {
+  const key = Object.keys(ACCS).find(k => ACCS[k].email === email);
+  if (key) verifyIssuer(key, true);
+  closeModal('mUser');
+}
+
+// ═══════════════════════════════════════════════════
+// ADMIN DISPUTES
+// ═══════════════════════════════════════════════════
+function renderDisputesTab() {
+  const el = document.getElementById('aDisputesList'); if (!el) return;
+  const open = DISPUTES.filter(d => d.status === 'open');
+  const revision = DISPUTES.filter(d => d.status === 'revision');
+  const resolved = DISPUTES.filter(d => d.status !== 'open' && d.status !== 'revision');
+  let html = '';
+  if (open.length > 0) {
+    html += `<div style="font-size:13px;font-weight:700;color:#dc2626;margin-bottom:10px">🔴 Открытые (${open.length})</div>`;
+    html += open.map(d => renderDisputeCard(d)).join('');
+  }
+  if (revision.length > 0) {
+    html += `<div style="font-size:13px;font-weight:700;color:#d97706;margin-top:20px;margin-bottom:10px">🔄 На доработке (${revision.length})</div>`;
+    html += revision.map(d => renderDisputeCard(d)).join('');
+  }
+  if (resolved.length > 0) {
+    html += `<div style="font-size:13px;font-weight:700;color:#16a34a;margin-top:20px;margin-bottom:10px">✅ Решённые (${resolved.length})</div>`;
+    html += resolved.map(d => renderDisputeCard(d)).join('');
+  }
+  if (DISPUTES.length === 0) html = '<div class="es"><div class="es-icon">✅</div>Споров нет</div>';
+  // Update open badge count (open + revision)
+  const badge = document.getElementById('disputeCount');
+  const activeCount = open.length + revision.length;
+  if (badge) badge.textContent = activeCount > 0 ? activeCount + ' активных' : '0 активных';
+  el.innerHTML = html;
+}
+
+function renderDisputeCard(d) {
+  const statusMap = {
+    open:            {cls:'r',  text:'🔴 Открыт',          color:'#dc2626'},
+    revision:        {cls:'y',  text:'🔄 На доработке',     color:'#d97706'},
+    resolved_issuer: {cls:'bl', text:'🔵 Решён (возврат)',  color:'#2563eb'},
+    resolved_blogger:{cls:'g',  text:'✅ Решён (выплата)',  color:'#16a34a'},
+    resolved_split:  {cls:'in', text:'⚖️ Решён (50/50)',    color:'#6366f1'},
+  };
+  const s = statusMap[d.status] || statusMap.open;
+  const statusClass = s.cls; const statusText = s.text;
+  return `<div class="deal-card" style="border-left-color:${s.color};cursor:pointer" onclick="openDisputeDetail(${d.id})">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+      <div>
+        <div style="font-size:15px;font-weight:800">Спор #${d.id}</div>
+        <div style="font-size:12px;color:#888;margin-top:2px">${d.issuer} ↔ ${d.blogger} · ${d.date}</div>
+      </div>
+      <span class="b ${statusClass}">${statusText}</span>
+    </div>
+    <div style="font-size:13px;color:#555;margin-bottom:8px">${d.reason.substring(0,80)}...</div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <span class="b in">₽${d.total.toLocaleString('ru')} в эскроу</span>
+      <span style="font-size:12px;color:#888">${d.msgs.length} сообщений</span>
+      <button class="btn btn-primary btn-sm" style="margin-left:auto" onclick="event.stopPropagation();openDisputeDetail(${d.id})">Рассмотреть →</button>
+    </div>
+  </div>`;
+}
+
+function openDisputeDetail(id) {
+  const d = DISPUTES.find(x => x.id === id); if (!d) return;
+  document.getElementById('mDisputeTitle').textContent = `Спор #${d.id}: ${d.issuer} ↔ ${d.blogger}`;
+  document.getElementById('mDisputeBody').innerHTML = `
+    <div class="g2" style="margin-bottom:16px">
+      <div class="sc c1" style="padding:14px"><div class="v" style="font-size:16px">₽${d.amount.toLocaleString('ru')}</div><div class="l">Гонорар блогера</div></div>
+      <div class="sc c4" style="padding:14px"><div class="v" style="font-size:16px">₽${d.total.toLocaleString('ru')}</div><div class="l">Всего в эскроу (+10%)</div></div>
+    </div>
+    <div style="background:#fff3cd;border:1px solid #fde68a;border-radius:8px;padding:12px;margin-bottom:16px;font-size:13px">
+      <b>Причина спора:</b> ${d.reason}
+    </div>
+    <div style="font-size:14px;font-weight:700;margin-bottom:10px">💬 Переписка по спору</div>
+    <div class="chat-wrap" style="margin-bottom:16px">
+      <div class="chat-msgs" style="max-height:200px">
+        ${d.msgs.map(m=>`<div class="chat-msg ${m.from==='admin'?'out':m.from==='issuer'?'in':'in'}" style="${m.from==='admin'?'':''}">
+          <b>${m.from==='issuer'?d.issuer:m.from==='blogger'?d.blogger:'👑 Админ'}</b><br>${m.text}
+          <div class="msg-time">${m.time}</div>
+        </div>`).join('')}
+      </div>
+      <div class="chat-input-row">
+        <input class="chat-input" id="disputeChatInput" placeholder="Написать сторонам...">
+        <button class="btn btn-primary btn-sm" onclick="sendDisputeMsg(${d.id})">Отправить</button>
+      </div>
+    </div>
+    <div style="font-size:14px;font-weight:700;margin-bottom:10px">⚖️ Принять решение</div>
+    <div style="background:#f0f4ff;border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#555">
+      💡 «На доработку» — пауза спора, блогеру даётся время исправить ситуацию. Средства остаются в эскроу.
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-danger btn-sm" onclick="resolveDispute(${d.id},'issuer')">💸 Вернуть эмитенту</button>
+      <button class="btn btn-success btn-sm" onclick="resolveDispute(${d.id},'blogger')">✅ Выплатить блогеру</button>
+      <button class="btn btn-warning btn-sm" onclick="splitDispute(${d.id})">⚖️ Разделить 50/50</button>
+      <button class="btn btn-secondary btn-sm" onclick="requestRevision(${d.id})" style="background:#e0e7ff;color:#4338ca;border:none">🔄 На доработку</button>
+    </div>`;
+  openModal('mDisputeDetail');
+}
+
+function sendDisputeMsg(id) {
+  const inp = document.getElementById('disputeChatInput');
+  const msg = inp.value.trim(); if (!msg) return;
+  const d = DISPUTES.find(x => x.id === id); if (!d) return;
+  const now = new Date();
+  d.msgs.push({from:'admin', text:msg, time:`${now.getDate()} мар, ${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`});
+  inp.value = '';
+  openDisputeDetail(id);
+  showToast('Сообщение отправлено обеим сторонам');
+}
+
+function resolveDispute(id, winner) {
+  const d = DISPUTES.find(x => x.id === id); if (!d) return;
+  d.status = winner === 'issuer' ? 'resolved_issuer' : 'resolved_blogger';
+  const text = winner === 'issuer' ? `💸 Средства ₽${d.total.toLocaleString('ru')} возвращены ${d.issuer}` : `✅ Средства ₽${d.amount.toLocaleString('ru')} выплачены ${d.blogger}`;
+  showToast(text);
+  closeModal('mDisputeDetail');
+  renderDisputesTab();
+  const openCount = DISPUTES.filter(x => x.status === 'open').length;
+  const badge = document.getElementById('disputeCount');
+  if (badge) badge.textContent = openCount > 0 ? openCount + ' открытых' : '0 открытых';
+  const sidebar = document.getElementById('verifyBadgeSidebar');
+  renderAdmin();
+}
+
+function splitDispute(id) {
+  const d = DISPUTES.find(x => x.id === id); if (!d) return;
+  d.status = 'resolved_split';
+  showToast(`⚖️ Разделено: ₽${Math.round(d.amount/2).toLocaleString('ru')} каждой стороне`);
+  closeModal('mDisputeDetail');
+  renderDisputesTab();
+  renderAdmin();
+}
+
+function requestRevision(id) {
+  const d = DISPUTES.find(x => x.id === id); if (!d) return;
+  const inp = document.getElementById('disputeChatInput');
+  const comment = (inp && inp.value.trim()) || 'Отправлено на доработку. Блогеру необходимо выполнить условия договора.';
+  d.status = 'revision';
+  const now = new Date();
+  d.msgs.push({
+    from:'admin',
+    text:'🔄 Спор переведён на доработку. ' + comment,
+    time:`${now.getDate()} мар, ${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`
+  });
+  showToast('🔄 Спор отправлен на доработку. Блогер уведомлён.');
+  closeModal('mDisputeDetail');
+  renderDisputesTab();
+  renderAdmin();
+}
+
+// ═══════════════════════════════════════════════════
+// ADMIN STAT ANALYTICS
+// ═══════════════════════════════════════════════════
+function openAdminStat(type) { try {
+  const titles = {users:'👥 Все пользователи', bloggers:'📱 Блогеры', issuers:'🏢 Эмитенты', escrow:'💰 Эскроу-операции'};
+  document.getElementById('mAdminStatTitle').textContent = titles[type] || 'Статистика';
+  const filterBar = (id, placeholderSearch, extraControls='') => `
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+      <input class="fi-sm" id="astat-search-${id}" placeholder="${placeholderSearch}" oninput="filterAdminStat('${id}')" style="flex:1;min-width:180px">
+      ${extraControls}
+    </div>
+    <div id="astat-list-${id}"></div>`;
+  let html = '';
+  if (type === 'users') {
+    html = `<div class="sc-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px">
+      <div class="sc c1"><div class="v">${USERS_LIST.length}</div><div class="l">Всего</div></div>
+      <div class="sc c2"><div class="v">${USERS_LIST.filter(u=>!u.banned).length}</div><div class="l">Активных</div></div>
+      <div class="sc c4"><div class="v">${USERS_LIST.filter(u=>u.banned).length}</div><div class="l">Заблок.</div></div>
+    </div>` + filterBar('users','🔍 Поиск по имени или email...',
+      `<select class="fi-sm" id="astat-role-users" onchange="filterAdminStat('users')" style="min-width:120px">
+        <option value="">Все роли</option><option value="ADMIN">ADMIN</option><option value="ISSUER">ISSUER</option><option value="BLOGGER">BLOGGER</option>
+      </select>`);
+  } else if (type === 'bloggers') {
+    const avgR = (BLOGGERS.reduce((a,b)=>a+b.r,0)/BLOGGERS.length).toFixed(1);
+    const totalDeals = BLOGGERS.reduce((a,b)=>a+b.deals,0);
+    html = `<div class="sc-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px">
+      <div class="sc c3"><div class="v">${BLOGGERS.length}</div><div class="l">Блогеров</div></div>
+      <div class="sc c1"><div class="v">${totalDeals}</div><div class="l">Сделок всего</div></div>
+      <div class="sc c2"><div class="v">★ ${avgR}</div><div class="l">Средний рейтинг</div></div>
+    </div>` + filterBar('bloggers','🔍 Поиск по имени или нише...',
+      `<select class="fi-sm" id="astat-sort-bloggers" onchange="filterAdminStat('bloggers')" style="min-width:140px">
+        <option value="rating">По рейтингу ↓</option><option value="deals">По сделкам ↓</option><option value="name">По имени А-Я</option>
+      </select>
+      <select class="fi-sm" id="astat-plat-bloggers" onchange="filterAdminStat('bloggers')" style="min-width:140px">
+        <option value="">Все платформы</option><option value="Telegram">Telegram</option><option value="YouTube">YouTube</option>
+        <option value="VK">VK</option><option value="Twitter/X">Twitter/X</option>
+      </select>`);
+  } else if (type === 'issuers') {
+    const issuers = Object.entries(ACCS).filter(([k,v])=>v.role==='ISSUER');
+    const verCount = issuers.filter(([k,v])=>v.verified).length;
+    html = `<div class="sc-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px">
+      <div class="sc c1"><div class="v">${issuers.length}</div><div class="l">Эмитентов</div></div>
+      <div class="sc c2"><div class="v">${verCount}</div><div class="l">Верифицировано</div></div>
+      <div class="sc c4"><div class="v">${issuers.length-verCount}</div><div class="l">На проверке</div></div>
+    </div>` + filterBar('issuers','🔍 Поиск по названию компании...',
+      `<select class="fi-sm" id="astat-status-issuers" onchange="filterAdminStat('issuers')" style="min-width:160px">
+        <option value="">Любой статус</option><option value="verified">✓ Верифицированные</option><option value="pending">⏳ На проверке</option>
+      </select>
+      <select class="fi-sm" id="astat-sort-issuers" onchange="filterAdminStat('issuers')" style="min-width:130px">
+        <option value="name">По имени А-Я</option><option value="deals_desc">По сделкам ↓</option><option value="rating_desc">По рейтингу ↓</option>
+      </select>`);
+  } else if (type === 'escrow') {
+    const escrowAmt = 10000; const paidAmt = 30000;
+    const escrowComm = Math.round(escrowAmt * COMMISSION);
+    const paidComm = Math.round(paidAmt * COMMISSION);
+    html = `<div class="sc-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px">
+      <div class="sc c2"><div class="v">₽${(escrowAmt+escrowComm).toLocaleString('ru')}</div><div class="l">В эскроу</div></div>
+      <div class="sc c1"><div class="v">₽${paidAmt.toLocaleString('ru')}</div><div class="l">Выплачено</div></div>
+      <div class="sc c4"><div class="v">₽${(escrowComm+paidComm).toLocaleString('ru')}</div><div class="l">Заработано</div></div>
+    </div>
+    <table class="tbl"><thead><tr><th>Сделка</th><th>Сумма</th><th>Комиссия</th><th>Статус</th></tr></thead><tbody>
+      <tr><td>BingX → Крипто Блогер 1</td><td>₽10 000</td><td>₽1 000</td><td><span class="b y">В эскроу</span></td></tr>
+      <tr><td>BingX → Инвест Блогер</td><td>₽20 000</td><td>₽2 000</td><td><span class="b g">Выплачено</span></td></tr>
+      <tr><td>BingX → Крипто Блогер 1</td><td>₽10 000</td><td>₽1 000</td><td><span class="b g">Выплачено</span></td></tr>
+    </tbody></table>`;
+  }
+  document.getElementById('mAdminStatBody').innerHTML = html;
+  // Trigger initial filter render for searchable types
+  if (['users','bloggers','issuers'].includes(type)) filterAdminStat(type);
+  openModal('mAdminStat');
+} catch(e) { showToast('❌ Ошибка: ' + e.message, 1); console.error('openAdminStat error:', e); }
+}
+
+function filterAdminStat(type) {
+  const q = (document.getElementById('astat-search-'+type)?.value || '').toLowerCase();
+  const listEl = document.getElementById('astat-list-'+type); if (!listEl) return;
+  if (type === 'users') {
+    const role = document.getElementById('astat-role-users')?.value || '';
+    let list = USERS_LIST.filter(u => {
+      const match = !q || u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q);
+      const roleMatch = !role || u.role === role;
+      return match && roleMatch;
+    });
+    if (list.length === 0) { listEl.innerHTML = '<div class="es" style="padding:16px">Ничего не найдено</div>'; return; }
+    listEl.innerHTML = list.map((u,i)=>{
+      const rc = u.role==='ADMIN'?'r':u.role==='ISSUER'?'in':'pu';
+      return `<div class="user-row" onclick="closeModal('mAdminStat');openUserDetail(${USERS_LIST.indexOf(u)})" style="cursor:pointer">
+        <div class="user-ava" style="background:${u.role==='ADMIN'?'#dc2626':u.role==='ISSUER'?'#6366f1':'#a855f7'}">${u.name[0]}</div>
+        <div style="flex:1"><div style="font-weight:700;font-size:14px">${u.name}</div><div style="font-size:12px;color:#888">${u.email} · ${u.date}</div></div>
+        <span class="b ${rc}">${u.role}</span>
+      </div>`;
+    }).join('');
+  } else if (type === 'bloggers') {
+    const sort = document.getElementById('astat-sort-bloggers')?.value || 'rating';
+    const plat = document.getElementById('astat-plat-bloggers')?.value || '';
+    let list = BLOGGERS.filter(b => {
+      const match = !q || b.n.toLowerCase().includes(q) || b.niche.toLowerCase().includes(q);
+      const platMatch = !plat || b.s.some(s => s.plat === plat);
+      return match && platMatch;
+    });
+    if (sort === 'rating') list.sort((a,b)=>b.r-a.r);
+    else if (sort === 'deals') list.sort((a,b)=>b.deals-a.deals);
+    else list.sort((a,b)=>a.n.localeCompare(b.n,'ru'));
+    if (list.length === 0) { listEl.innerHTML = '<div class="es" style="padding:16px">Ничего не найдено</div>'; return; }
+    listEl.innerHTML = list.map(b=>`<div class="user-row">
+      <div class="bc-av" style="width:38px;height:38px;border-radius:10px;font-size:14px;margin-bottom:0">${b.n[0]}</div>
+      <div style="flex:1">
+        <div style="font-weight:700;font-size:14px">${b.n}</div>
+        <div style="font-size:12px;color:#888">${b.niche} · ${b.geo} · ${b.s.length} платформ</div>
+        <div style="font-size:11px;color:#aaa;margin-top:2px">${b.s.map(s=>`${PLATFORM_ICONS[s.plat]||'📡'} ${(s.subs/1000).toFixed(0)}K`).join(' · ')}</div>
+      </div>
+      <div style="text-align:right">
+        <span class="b gr" style="display:block;margin-bottom:4px">✅ ${b.deals} сделок</span>
+        <span class="b in">★ ${b.r}</span>
+      </div>
+    </div>`).join('');
+  } else if (type === 'issuers') {
+    const statusF = document.getElementById('astat-status-issuers')?.value || '';
+    const sort = document.getElementById('astat-sort-issuers')?.value || 'name';
+    let list = Object.entries(ACCS).filter(([k,v])=>v.role==='ISSUER').filter(([k,v])=>{
+      const match = !q || v.name.toLowerCase().includes(q) || v.email.toLowerCase().includes(q);
+      const statusMatch = !statusF || (statusF==='verified'?v.verified:!v.verified);
+      return match && statusMatch;
+    });
+    if (sort === 'deals_desc') list.sort(([,a],[,b])=>(b.deals||0)-(a.deals||0));
+    else if (sort === 'rating_desc') list.sort(([,a],[,b])=>(b.r||0)-(a.r||0));
+    else list.sort(([,a],[,b])=>a.name.localeCompare(b.name,'ru'));
+    if (list.length === 0) { listEl.innerHTML = '<div class="es" style="padding:16px">Ничего не найдено</div>'; return; }
+    listEl.innerHTML = list.map(([k,v])=>`
+      <div class="user-row">
+        <div class="user-ava" style="background:#6366f1">${v.name[0]}</div>
+        <div style="flex:1">
+          <div style="font-weight:700">${v.name}</div>
+          <div style="font-size:12px;color:#888">${v.email} · ${v.type||'ISSUER'}</div>
+          ${v.site?`<div style="font-size:11px;color:#6366f1">${v.site}</div>`:''}
+        </div>
+        <div style="text-align:right">
+          ${v.verified?'<span class="b g">✓ Верифицирован</span>':'<span class="b y">⏳ На проверке</span>'}
+          ${v.r?`<br><span class="b in" style="margin-top:4px">★ ${v.r} · ${v.deals} сделок</span>`:''}
+        </div>
+      </div>`).join('');
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// COMMISSION MANAGEMENT (Admin)
+// ═══════════════════════════════════════════════════
+function renderCommissionsTab() {
+  // Update global rate display
+  const globalPct = Math.round(COMMISSION * 100);
+  const disp = document.getElementById('globalCommDisplay');
+  const inp = document.getElementById('globalCommInput');
+  if (disp) disp.textContent = globalPct + '%';
+  if (inp) inp.value = globalPct;
+  renderBloggerCommList();
+  renderExclusiveServices();
+}
+
+function renderBloggerCommList(filter) {
+  const bList = document.getElementById('bloggerCommList');
+  if (!bList) return;
+  const globalPct = Math.round(COMMISSION * 100);
+  const q = (filter !== undefined ? filter : (document.getElementById('commBloggerSearch')?.value || '')).toLowerCase();
+  let list = BLOGGERS.filter(b => !q || b.n.toLowerCase().includes(q) || b.niche.toLowerCase().includes(q));
+
+  if (list.length === 0) {
+    bList.innerHTML = '<div class="es" style="padding:20px">Блогеры не найдены</div>';
+    return;
+  }
+
+  bList.innerHTML = list.map(b => {
+    const baseCustom = CUSTOM_COMMISSIONS[b.id];
+    const basePct = baseCustom !== undefined ? Math.round(baseCustom*100) : globalPct;
+    const hasBase = baseCustom !== undefined;
+    // Count per-service overrides
+    const svcOverrides = b.p.filter((p,si) => CUSTOM_COMMISSIONS['b'+b.id+'_s'+si] !== undefined).length;
+    const expanded = window._commExpanded && window._commExpanded[b.id];
+
+    const serviceRows = b.p.map((p, si) => {
+      const key = 'b'+b.id+'_s'+si;
+      const svcCustom = CUSTOM_COMMISSIONS[key];
+      const svcPct = svcCustom !== undefined ? Math.round(svcCustom*100) : '';
+      const hasSvc = svcCustom !== undefined;
+      return `<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:${hasSvc?'#eff6ff':'#f8f8fb'};border-radius:8px;margin:3px 0;border:1px solid ${hasSvc?'#bfdbfe':'#eee'}">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.n}</div>
+          <div style="font-size:11px;color:#aaa">₽${p.p.toLocaleString('ru')} · ${hasSvc?'<span style="color:#3b82f6;font-weight:700">индив. '+Math.round(svcCustom*100)+'%</span>':'наследует базовую ('+basePct+'%)'}</div>
+        </div>
+        <input class="fi" type="number" id="svc_${b.id}_${si}" min="0" max="50" step="0.5" value="${svcPct}" placeholder="${basePct}" style="width:68px;padding:4px 8px;font-size:12px;flex-shrink:0">
+        <span style="font-size:12px;font-weight:700;flex-shrink:0">%</span>
+        <button class="btn btn-success btn-sm" style="padding:4px 8px;flex-shrink:0" onclick="saveServiceCommByBlogger(${b.id},${si})">✓</button>
+        ${hasSvc?`<button class="btn btn-secondary btn-sm" style="padding:4px 8px;flex-shrink:0" onclick="resetServiceComm(${b.id},${si})" title="Сброс">✕</button>`:''}
+      </div>`;
+    }).join('');
+
+    return `<div style="border:1px solid ${hasBase?'#86efac':'#e5e5e5'};border-radius:12px;margin-bottom:10px;overflow:hidden">
+      <!-- Header row (always visible) -->
+      <div style="display:flex;align-items:center;gap:10px;padding:12px;background:${hasBase?'#f0fdf4':'#f9f9fc'};cursor:pointer" onclick="toggleCommRow(${b.id})">
+        <div class="bc-av" style="width:36px;height:36px;border-radius:10px;font-size:14px;margin-bottom:0;flex-shrink:0">${b.n[0]}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:700;font-size:14px">${b.n}</div>
+          <div style="font-size:12px;color:#888">${b.niche} · ${b.p.length} услуг${svcOverrides>0?` · <span style="color:#3b82f6">🎯 ${svcOverrides} перезаписано</span>`:''}</div>
+        </div>
+        <!-- Inline base rate controls -->
+        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0" onclick="event.stopPropagation()">
+          <span style="font-size:12px;color:#888">База:</span>
+          <input class="fi" type="number" id="bcomm_${b.id}" min="0" max="50" step="0.5" value="${basePct}" style="width:70px;padding:4px 8px;font-size:13px" placeholder="${globalPct}">
+          <span style="font-weight:700;font-size:12px">%</span>
+          <button class="btn btn-success btn-sm" style="padding:4px 8px" onclick="saveBloggerComm(${b.id})">✓</button>
+          ${hasBase?`<button class="btn btn-secondary btn-sm" style="padding:4px 8px" onclick="resetBloggerComm(${b.id})" title="Сброс">✕</button>`:''}
+        </div>
+        <div style="font-size:18px;color:#aaa;flex-shrink:0;transition:.2s;transform:${expanded?'rotate(180deg)':'rotate(0deg)'}">${expanded?'▲':'▼'}</div>
+      </div>
+      <!-- Expandable services -->
+      ${expanded ? `<div style="padding:8px 12px 10px;background:#fff;border-top:1px solid #f0f0f8">${serviceRows}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function toggleCommRow(bloggerId) {
+  if (!window._commExpanded) window._commExpanded = {};
+  window._commExpanded[bloggerId] = !window._commExpanded[bloggerId];
+  renderBloggerCommList();
+}
+
+function renderExclusiveServices() {
+  const el = document.getElementById('exclusiveServicesList'); if (!el) return;
+  if (EXCLUSIVE_SERVICES.length === 0) {
+    el.innerHTML = '<div class="es" style="padding:16px">Нет эксклюзивных услуг. Нажмите «Добавить» для создания.</div>';
+    return;
+  }
+  el.innerHTML = EXCLUSIVE_SERVICES.map((svc, i) => `
+    <div style="padding:14px;background:#fafafa;border-radius:10px;margin-bottom:10px;border:1px solid #e5e5e5">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap">
+        <div style="flex:1;min-width:220px">
+          <div style="font-size:14px;font-weight:700;color:#1e1e2e">🌟 ${svc.name}</div>
+          <div style="font-size:12px;color:#888;margin-top:3px">${svc.desc}</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px">
+            <span style="font-size:12px;color:#6366f1">₽${svc.price.toLocaleString('ru')}</span>
+            ${svc.bloggerName ? `<span style="font-size:12px;background:#e8f5e9;color:#16a34a;padding:1px 8px;border-radius:20px">👤 ${svc.bloggerName}</span>` : '<span style="font-size:12px;color:#aaa">Без привязки к блогеру</span>'}
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+          <label style="font-size:12px;color:#888">Ставка:</label>
+          <input class="fi" type="number" id="scomm_${i}" min="0" max="50" step="0.5" value="${Math.round(svc.comm*100)}" style="width:70px;padding:6px 8px">
+          <span style="font-weight:700">%</span>
+          <button class="btn btn-success btn-sm" onclick="saveServiceComm(${i})">✓</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteExclusiveService(${i})">🗑</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function saveGlobalComm() {
+  const inp = document.getElementById('globalCommInput');
+  const v = parseFloat(inp?.value);
+  if (isNaN(v) || v < 0 || v > 50) { showToast('Введите значение от 0 до 50%', 1); return; }
+  COMMISSION = v / 100;
+  const disp = document.getElementById('globalCommDisplay');
+  if (disp) disp.textContent = v + '%';
+  showToast('✓ Глобальная ставка обновлена: ' + v + '%');
+  renderBloggerCommList();
+}
+
+function saveBloggerComm(bloggerId) {
+  const b = BLOGGERS.find(x => x.id === bloggerId);
+  const inp = document.getElementById('bcomm_' + bloggerId);
+  const v = parseFloat(inp?.value);
+  if (isNaN(v) || v < 0 || v > 50) { showToast('Введите значение от 0 до 50%', 1); return; }
+  CUSTOM_COMMISSIONS[bloggerId] = v / 100;
+  showToast('✓ ' + (b?.n || 'Блогер') + ': базовая ставка ' + v + '%');
+  renderBloggerCommList();
+}
+
+function resetBloggerComm(bloggerId) {
+  const b = BLOGGERS.find(x => x.id === bloggerId);
+  delete CUSTOM_COMMISSIONS[bloggerId];
+  showToast('↩️ Ставка для ' + (b?.n || 'блогера') + ' сброшена к глобальной (' + Math.round(COMMISSION * 100) + '%)');
+  renderBloggerCommList();
+}
+
+function saveServiceComm(idx) {
+  const v = parseFloat(document.getElementById('scomm_' + idx)?.value);
+  if (isNaN(v) || v < 0 || v > 50) { showToast('Введите значение от 0 до 50%', 1); return; }
+  EXCLUSIVE_SERVICES[idx].comm = v / 100;
+  CUSTOM_COMMISSIONS['service_' + EXCLUSIVE_SERVICES[idx].key] = v / 100;
+  showToast(`✓ Ставка для «${EXCLUSIVE_SERVICES[idx].name}»: ${v}%`);
+  renderExclusiveServices();
+}
+
+function deleteExclusiveService(idx) {
+  const svc = EXCLUSIVE_SERVICES[idx];
+  delete CUSTOM_COMMISSIONS['service_' + svc.key];
+  EXCLUSIVE_SERVICES.splice(idx, 1);
+  showToast(`Услуга «${svc.name}» удалена`);
+  renderExclusiveServices();
+}
+
+function addExclusiveService() {
+  // Populate blogger dropdown
+  const sel = document.getElementById('exclBlogger');
+  if (sel) {
+    sel.innerHTML = '<option value="">— Доступно всем подходящим блогерам —</option>' +
+      BLOGGERS.map(b => `<option value="${b.id}">${b.n} (${b.s[0]?.plat || '—'}, ${(b.s[0]?.subs/1000||0).toFixed(0)}K)</option>`).join('');
+  }
+  // Clear form
+  ['exclName','exclDesc','exclPrice'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+  const commEl = document.getElementById('exclComm'); if (commEl) commEl.value = '10';
+  openModal('mAddExcl');
+}
+
+function submitAddExclusiveService() {
+  const name = document.getElementById('exclName')?.value.trim();
+  if (!name) { showToast('Введите название услуги', 1); return; }
+  const desc = document.getElementById('exclDesc')?.value.trim() || '';
+  const bloggerId = document.getElementById('exclBlogger')?.value || '';
+  const price = parseInt(document.getElementById('exclPrice')?.value || '0', 10) || 0;
+  const commPct = parseFloat(document.getElementById('exclComm')?.value || '10');
+  const comm = (isNaN(commPct) ? 10 : commPct) / 100;
+  const key = 'custom_' + Date.now();
+  const blogger = BLOGGERS.find(b => b.id == bloggerId);
+  EXCLUSIVE_SERVICES.push({key, name, desc, comm, price, bloggerId: bloggerId || null, bloggerName: blogger?.n || null});
+  CUSTOM_COMMISSIONS['service_' + key] = comm;
+  showToast(`✓ Эксклюзивная услуга «${name}» добавлена${blogger ? ' → ' + blogger.n : ''}`);
+  closeModal('mAddExcl');
+  renderExclusiveServices();
+}
+
+// ═══════════════════════════════════════════════════
+// ADMIN TAGS
+// ═══════════════════════════════════════════════════
+function renderAdminTagsTab() {
+  const list = document.getElementById('adminTagsList');
+  const stats = document.getElementById('adminTagsStats');
+  if (!list) return;
+
+  // Count usage across all bloggers
+  const usageCounts = {};
+  ALL_TAGS.forEach(t => usageCounts[t] = 0);
+  BLOGGERS.forEach(b => b.tags.forEach(t => { if (usageCounts[t] !== undefined) usageCounts[t]++; }));
+
+  list.innerHTML = ALL_TAGS.map((t,i) => `
+    <div style="display:inline-flex;align-items:center;gap:6px;background:#eef2ff;border:1.5px solid #c7d2fe;border-radius:8px;padding:5px 10px">
+      <span style="font-size:13px;font-weight:600;color:#4338ca">#${t}</span>
+      <span style="font-size:11px;color:#818cf8">${usageCounts[t] || 0} авт.</span>
+      <button onclick="removeAdminTag(${i})" style="background:none;border:none;cursor:pointer;color:#a5b4fc;font-size:14px;line-height:1;padding:0;margin-left:2px" title="Удалить тег">×</button>
+    </div>`).join('');
+
+  if (stats) {
+    const sorted = [...ALL_TAGS].sort((a,b) => (usageCounts[b]||0) - (usageCounts[a]||0));
+    stats.innerHTML = sorted.map(t => {
+      const count = usageCounts[t] || 0;
+      const maxCount = Math.max(...Object.values(usageCounts), 1);
+      const pct = Math.round(count / BLOGGERS.length * 100);
+      return `<div style="display:flex;align-items:center;gap:8px;width:100%;padding:4px 0">
+        <span style="font-size:13px;font-weight:600;color:#444;min-width:90px">#${t}</span>
+        <div style="flex:1;background:#f0f0f8;border-radius:4px;height:8px">
+          <div style="width:${Math.round(count/BLOGGERS.length*100)}%;background:#6366f1;border-radius:4px;height:8px;min-width:${count>0?4:0}px"></div>
+        </div>
+        <span style="font-size:12px;color:#888;min-width:50px">${count}/${BLOGGERS.length} авт.</span>
+      </div>`;
+    }).join('');
+  }
+}
+
+function addAdminTag() {
+  const name = prompt('Название нового тега (без #):');
+  if (!name) return;
+  const clean = name.trim().toLowerCase().replace(/[^a-zа-яё0-9_\-\.]/gi,'');
+  if (!clean) { showToast('Некорректное название тега', 1); return; }
+  if (ALL_TAGS.includes(clean)) { showToast('Тег уже существует', 1); return; }
+  ALL_TAGS.push(clean);
+  showToast('✅ Тег #' + clean + ' добавлен');
+  renderAdminTagsTab();
+  renderProfileTags();
+}
+
+function removeAdminTag(idx) {
+  const tag = ALL_TAGS[idx];
+  if (!confirm('Удалить тег #' + tag + '? Он будет убран из профилей блогеров.')) return;
+  ALL_TAGS.splice(idx, 1);
+  BLOGGERS.forEach(b => { b.tags = b.tags.filter(t => t !== tag); });
+  showToast('🗑 Тег #' + tag + ' удалён');
+  renderAdminTagsTab();
+}
+
+function saveServiceCommByBlogger(bloggerId, serviceIdx) {
+  const b = BLOGGERS.find(x => x.id === bloggerId);
+  const svc = b?.p[serviceIdx];
+  const inp = document.getElementById('svc_' + bloggerId + '_' + serviceIdx);
+  const v = parseFloat(inp?.value);
+  if (isNaN(v) || v < 0 || v > 50) { showToast('Введите значение от 0 до 50%', 1); return; }
+  const key = 'b' + bloggerId + '_s' + serviceIdx;
+  CUSTOM_COMMISSIONS[key] = v / 100;
+  showToast('✓ Услуга «' + (svc?.n || '') + '» (' + (b?.n || '') + '): ' + v + '%');
+  renderBloggerCommList();
+}
+
+function resetServiceComm(bloggerId, serviceIdx) {
+  const b = BLOGGERS.find(x => x.id === bloggerId);
+  const svc = b?.p[serviceIdx];
+  delete CUSTOM_COMMISSIONS['b' + bloggerId + '_s' + serviceIdx];
+  showToast('↩️ Ставка услуги «' + (svc?.n || '') + '» сброшена');
+  renderBloggerCommList();
+}
+
+// ═══════════════════════════════════════════════════
+// CHARTS (Canvas API — без CDN)
+// ═══════════════════════════════════════════════════
+function drawCharts() {
+  drawBarChart('chartDeals',
+    ['Окт','Ноя','Дек','Янв','Фев','Мар'],
+    [85000, 120000, 98000, 145000, 210000, 87000],
+    '#6366f1');
+  drawBarChart('chartUsers',
+    ['Окт','Ноя','Дек','Янв','Фев','Мар'],
+    [12, 18, 14, 27, 35, 9],
+    '#a855f7');
+  drawLineChart('chartComm',
+    ['Окт','Ноя','Дек','Янв','Фев','Мар'],
+    [6800, 9600, 7840, 11600, 16800, 6960],
+    '#16a34a');
+}
+
+function drawBarChart(canvasId, labels, data, color) {
+  const c = document.getElementById(canvasId); if (!c) return;
+  const ctx = c.getContext('2d');
+  const w = c.width, h = c.height;
+  const pad = {l:44, r:12, t:12, b:28};
+  const cw = w - pad.l - pad.r, ch = h - pad.t - pad.b;
+  ctx.clearRect(0, 0, w, h);
+  const max = Math.max(...data) * 1.15 || 1;
+  // Grid
+  ctx.strokeStyle = '#f0f0f8'; ctx.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) {
+    const y = pad.t + ch - (i/4)*ch;
+    ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(w - pad.r, y); ctx.stroke();
+    ctx.fillStyle = '#aaa'; ctx.font = '10px system-ui'; ctx.textAlign = 'right';
+    ctx.fillText(fmtShort(max*i/4), pad.l - 4, y + 3);
+  }
+  // Bars
+  const bw = (cw / labels.length) * 0.6;
+  const gap = cw / labels.length;
+  labels.forEach((label, i) => {
+    const bh = (data[i] / max) * ch;
+    const x = pad.l + gap * i + gap * 0.2;
+    const y = pad.t + ch - bh;
+    // Gradient
+    const grad = ctx.createLinearGradient(0, y, 0, y + bh);
+    grad.addColorStop(0, color);
+    grad.addColorStop(1, color + '88');
+    ctx.fillStyle = grad;
+    const r = 4;
+    ctx.beginPath();
+    ctx.moveTo(x + r, y); ctx.lineTo(x + bw - r, y);
+    ctx.arcTo(x+bw, y, x+bw, y+r, r);
+    ctx.lineTo(x+bw, y+bh); ctx.lineTo(x, y+bh); ctx.lineTo(x, y+r);
+    ctx.arcTo(x, y, x+r, y, r); ctx.closePath();
+    ctx.fill();
+    // Label
+    ctx.fillStyle = '#888'; ctx.font = '10px system-ui'; ctx.textAlign = 'center';
+    ctx.fillText(label, x + bw/2, h - pad.b + 14);
+  });
+}
+
+function drawLineChart(canvasId, labels, data, color) {
+  const c = document.getElementById(canvasId); if (!c) return;
+  const ctx = c.getContext('2d');
+  const w = c.width, h = c.height;
+  const pad = {l:44, r:12, t:12, b:28};
+  const cw = w - pad.l - pad.r, ch = h - pad.t - pad.b;
+  ctx.clearRect(0, 0, w, h);
+  const max = Math.max(...data) * 1.15 || 1;
+  ctx.strokeStyle = '#f0f0f8'; ctx.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) {
+    const y = pad.t + ch - (i/4)*ch;
+    ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(w - pad.r, y); ctx.stroke();
+    ctx.fillStyle = '#aaa'; ctx.font = '10px system-ui'; ctx.textAlign = 'right';
+    ctx.fillText(fmtShort(max*i/4), pad.l - 4, y + 3);
+  }
+  const pts = labels.map((l, i) => ({
+    x: pad.l + (cw/(labels.length-1))*i,
+    y: pad.t + ch - (data[i]/max)*ch
+  }));
+  // Fill
+  const grad = ctx.createLinearGradient(0, pad.t, 0, pad.t + ch);
+  grad.addColorStop(0, color + '33');
+  grad.addColorStop(1, color + '05');
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, pad.t + ch);
+  pts.forEach(p => ctx.lineTo(p.x, p.y));
+  ctx.lineTo(pts[pts.length-1].x, pad.t + ch);
+  ctx.closePath(); ctx.fillStyle = grad; ctx.fill();
+  // Line
+  ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = 2.5;
+  pts.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+  ctx.stroke();
+  // Dots
+  pts.forEach(p => {
+    ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI*2);
+    ctx.fillStyle = '#fff'; ctx.fill();
+    ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.stroke();
+  });
+  // Labels
+  labels.forEach((l, i) => {
+    ctx.fillStyle = '#888'; ctx.font = '10px system-ui'; ctx.textAlign = 'center';
+    ctx.fillText(l, pts[i].x, h - pad.b + 14);
+  });
+}
+
+function fmtShort(n) {
+  if (n >= 1000000) return (n/1000000).toFixed(1) + 'М';
+  if (n >= 1000) return (n/1000).toFixed(0) + 'К';
+  return Math.round(n).toString();
+}
+
+// ═══════════════════════════════════════════════════
+// MODALS & TOAST
+// ═══════════════════════════════════════════════════
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.mo').forEach(m => m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); }));
+
+let toastTimer;
+// Stat card click bindings — multiple methods for maximum reliability
+function bindStatCards() {
+  ['users','bloggers','issuers','escrow'].forEach(function(type) {
+    const btn = document.getElementById('statBtn-' + type);
+    if (btn) {
+      btn.onclick = function(e) { e.stopPropagation(); openAdminStat(type); };
+      btn.addEventListener('click', function(e) { e.stopPropagation(); openAdminStat(type); });
+    }
+  });
+}
+// Bind on both events to guarantee firing
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', bindStatCards);
+} else {
+  bindStatCards();
+}
+window.addEventListener('load', bindStatCards);
+
+function showToast(msg, err) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = err ? '#dc2626' : '#1a1a2e';
+  t.style.transform = 'translateY(0)'; t.style.opacity = '1';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.style.transform = 'translateY(80px)'; t.style.opacity = '0'; }, 3500);
+}
+</script>
+</body>
+</html>
