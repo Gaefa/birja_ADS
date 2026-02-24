@@ -30,16 +30,44 @@ export class DealsService {
       throw new NotFoundException('Blogger not found');
     }
 
+    // ── Dynamic commission calculation ──────────────────────────────────────
+    // Priority: per-blogger override → global setting → fallback 10%
+    let commRate = 0.10;
+
+    const perBloggerSetting = await this.prisma.commissionSetting.findUnique({
+      where: { bloggerId: dto.bloggerId },
+    });
+
+    if (perBloggerSetting) {
+      commRate = Number(perBloggerSetting.rate);
+    } else {
+      const globalSetting = await this.prisma.commissionSetting.findFirst({
+        where: { bloggerId: null },
+      });
+      if (globalSetting) {
+        commRate = Number(globalSetting.rate);
+      }
+    }
+
+    const amount = Number(dto.amount);
+    const platformCommission = Math.round(amount * commRate);
+    const bloggerAmount = amount; // blogger receives full amount; issuer pays amount + commission
+    // ────────────────────────────────────────────────────────────────────────
+
     return this.prisma.deal.create({
       data: {
         issuerId: issuer.id,
         bloggerId: dto.bloggerId,
         title: dto.title,
-        brief: dto.brief,
+        brief: dto.brief ?? null,
         amount: dto.amount,
         currency: dto.currency,
-        platformCommission: 0,
-        bloggerAmount: dto.amount,
+        platformCommission,
+        bloggerAmount,
+        // New fields: channel, format, technical spec
+        socialPlatform: dto.socialPlatform ?? null,
+        formatName: dto.formatName ?? null,
+        tz: dto.tz ?? null,
       },
       include: {
         issuer: {

@@ -1,3 +1,23 @@
+export type SocialPlatform = 'TELEGRAM' | 'YOUTUBE' | 'INSTAGRAM' | 'TIKTOK' | 'TWITTER' | 'VK';
+
+export const PLATFORM_LABELS: Record<SocialPlatform, string> = {
+  TELEGRAM: 'Telegram',
+  YOUTUBE: 'YouTube',
+  INSTAGRAM: 'Instagram',
+  TIKTOK: 'TikTok',
+  TWITTER: 'Twitter/X',
+  VK: 'VK',
+};
+
+export const PLATFORM_ICONS: Record<SocialPlatform, string> = {
+  TELEGRAM: '✈️',
+  YOUTUBE: '▶️',
+  INSTAGRAM: '📸',
+  TIKTOK: '🎵',
+  TWITTER: '🐦',
+  VK: '💙',
+};
+
 export interface User {
   id: string;
   email: string;
@@ -30,7 +50,7 @@ export interface BloggerProfile {
 
 export interface SocialAccount {
   id: string;
-  platform: 'instagram' | 'tiktok' | 'youtube' | 'telegram' | 'twitch';
+  platform: SocialPlatform;
   username: string;
   url: string;
   followersCount: number;
@@ -46,6 +66,10 @@ export interface PriceListItem {
   priceRub: number;
   durationDays: number;
   isAvailable: boolean;
+  /** Platform this format belongs to; null = universal */
+  platform?: SocialPlatform | null;
+  /** True for Спецпроект — price negotiated individually */
+  isSpecialProject?: boolean;
 }
 
 export interface PortfolioItem {
@@ -66,6 +90,8 @@ export interface IssuerProfile {
   logo?: string;
   website?: string;
   description?: string;
+  rating?: number;
+  totalDeals?: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -74,6 +100,7 @@ export interface Campaign {
   id: string;
   issuerId: string;
   issuerName: string;
+  issuerRating?: number;
   title: string;
   description: string;
   brief?: string;
@@ -103,6 +130,12 @@ export interface Deal {
   pitchText?: string;
   content?: string;
   deadline: string;
+  /** Platform/channel for this deal */
+  socialPlatform?: SocialPlatform | null;
+  /** Format name from the price list */
+  formatName?: string | null;
+  /** Technical specification */
+  tz?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -130,4 +163,32 @@ export interface CampaignApplication {
   pitchText: string;
   status: 'pending' | 'accepted' | 'rejected';
   createdAt: string;
+}
+
+// ─── Commission Types ──────────────────────────────────────────────────────
+
+export interface CommissionSettings {
+  globalRate: number;
+  perBlogger: Array<{
+    bloggerId: number;
+    bloggerName: string;
+    rate: number;
+  }>;
+}
+
+// ─── Exclusive Service Types ───────────────────────────────────────────────
+
+export interface ExclusiveService {
+  id: string;
+  key: string;
+  name: string;
+  description?: string;
+  priceRub: number;
+  commRate: number;
+  isActive: boolean;
+  /** Linked blogger (optional) */
+  bloggerId?: number | null;
+  blogger?: { id: number; displayName: string } | null;
+  createdAt: string;
+  updatedAt: string;
 }

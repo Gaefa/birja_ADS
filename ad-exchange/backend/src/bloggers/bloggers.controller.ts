@@ -6,6 +6,7 @@ import {
   Delete,
   Body,
   Param,
+  Query,
   UseGuards,
   ParseIntPipe,
 } from '@nestjs/common';
@@ -126,8 +127,18 @@ export class BloggersController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ISSUER')
   @ApiBearerAuth()
-  getAllBloggers() {
-    return this.bloggersService.getAllBloggers();
+  getAllBloggers(
+    @Query('platform') platform?: string,
+    @Query('minFollowers') minFollowers?: string,
+    @Query('maxPrice') maxPrice?: string,
+    @Query('search') search?: string,
+  ) {
+    return this.bloggersService.getAllBloggers({
+      platform: platform || undefined,
+      minFollowers: minFollowers ? parseInt(minFollowers, 10) : undefined,
+      maxPrice: maxPrice ? parseInt(maxPrice, 10) : undefined,
+      search: search || undefined,
+    });
   }
 
   @Get(':id')

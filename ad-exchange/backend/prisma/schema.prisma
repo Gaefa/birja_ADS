@@ -15,7 +15,8 @@ model User {
   id        Int     @id @default(autoincrement())
   email     String  @unique
   password  String
-  role      UserRole
+  /// UserRole: BLOGGER | ISSUER | ADMIN
+  role      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -23,12 +24,6 @@ model User {
   issuerProfile  IssuerProfile?
   disputesResolved Dispute[] @relation("resolvedDisputies")
   transactions   Transaction[]
-}
-
-enum UserRole {
-  BLOGGER
-  ISSUER
-  ADMIN
 }
 
 model BloggerProfile {
@@ -53,12 +48,15 @@ model BloggerProfile {
   campaignApplies   CampaignApplication[]
   deals             Deal[] @relation("bloggerDeals")
   reviews           Review[] @relation("bloggerReviews")
+  commissionSetting CommissionSetting?
+  exclusiveServices ExclusiveService[]
 }
 
 model SocialAccount {
   id              Int     @id @default(autoincrement())
   bloggerId       Int
-  platform        SocialPlatform
+  /// SocialPlatform: TELEGRAM | YOUTUBE | INSTAGRAM | TIKTOK | TWITTER | VK
+  platform        String
   username        String
   url             String?
   followersCount  Int?
@@ -73,28 +71,24 @@ model SocialAccount {
   @@unique([bloggerId, platform])
 }
 
-enum SocialPlatform {
-  TELEGRAM
-  YOUTUBE
-  INSTAGRAM
-  TIKTOK
-  TWITTER
-}
-
 model PriceListItem {
-  id          Int     @id @default(autoincrement())
-  bloggerId   Int
-  formatName  String
-  description String?
-  priceRub    Decimal?
-  priceUsd    Decimal?
-  priceUsdt   Decimal?
-  durationDays Int?
-  isAvailable Boolean @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id              Int             @id @default(autoincrement())
+  bloggerId       Int
+  formatName      String
+  description     String?
+  priceRub        Decimal?
+  priceUsd        Decimal?
+  priceUsdt       Decimal?
+  durationDays    Int?
+  isAvailable     Boolean         @default(true)
+  /// SocialPlatform or null (universal / all platforms)
+  platform        String?
+  /// Спецпроект — price negotiated individually, priceRub = 0
+  isSpecialProject Boolean        @default(false)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
 
-  blogger     BloggerProfile @relation(fields: [bloggerId], references: [id], onDelete: Cascade)
+  blogger         BloggerProfile  @relation(fields: [bloggerId], references: [id], onDelete: Cascade)
 }
 
 model PortfolioItem {
@@ -116,11 +110,13 @@ model IssuerProfile {
   companyName         String
   logo                String?
   description         String?
-  companyType         CompanyType
+  /// CompanyType: BROKER | CRYPTO_EXCHANGE | DEFI | FUND | OTHER
+  companyType         String
   website             String?
   isVerified          Boolean @default(false)
   verifiedAt          DateTime?
-  subscriptionTier    SubscriptionTier @default(BASE)
+  /// SubscriptionTier: BASE | PRO
+  subscriptionTier    String @default("BASE")
   subscriptionExpiresAt DateTime?
   rating              Float   @default(0)
   totalDeals          Int     @default(0)
@@ -131,20 +127,7 @@ model IssuerProfile {
   campaigns Campaign[]
   deals     Deal[]
   reviews   Review[] @relation("issuerReviews")
-  disputes  Dispute[]
-}
-
-enum CompanyType {
-  BROKER
-  CRYPTO_EXCHANGE
-  DEFI
-  FUND
-  OTHER
-}
-
-enum SubscriptionTier {
-  BASE
-  PRO
+  disputes  Dispute[] @relation("issuerDisputes")
 }
 
 model Campaign {
@@ -154,10 +137,12 @@ model Campaign {
   description     String?
   brief           String?
   budgetPerBlogger Decimal
-  currency        CurrencyType
+  /// CurrencyType: RUB | USD | USDT
+  currency        String
   bloggersNeeded  Int
   deadline        DateTime
-  status          CampaignStatus @default(DRAFT)
+  /// CampaignStatus: DRAFT | ACTIVE | PAUSED | COMPLETED | CANCELLED
+  status          String @default("DRAFT")
   isPrivate       Boolean @default(false)
   platforms       String @default("[]")
   createdAt       DateTime @default(now())
@@ -165,21 +150,7 @@ model Campaign {
 
   issuer          IssuerProfile @relation(fields: [issuerId], references: [id], onDelete: Cascade)
   applications    CampaignApplication[]
-  deals           Deal[]
-}
-
-enum CampaignStatus {
-  DRAFT
-  ACTIVE
-  PAUSED
-  COMPLETED
-  CANCELLED
-}
-
-enum CurrencyType {
-  RUB
-  USD
-  USDT
+  deals           Deal[] @relation("campaignDeals")
 }
 
 model CampaignApplication {
@@ -188,7 +159,8 @@ model CampaignApplication {
   bloggerId   Int
   pitch       String?
   proposedPrice Decimal
-  status      ApplicationStatus @default(PENDING)
+  /// ApplicationStatus: PENDING | ACCEPTED | REJECTED
+  status      String @default("PENDING")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -199,31 +171,35 @@ model CampaignApplication {
   @@unique([campaignId, bloggerId])
 }
 
-enum ApplicationStatus {
-  PENDING
-  ACCEPTED
-  REJECTED
-}
-
 model Deal {
-  id                      Int     @id @default(autoincrement())
-  campaignApplicationId   Int?    @unique
+  id                      Int             @id @default(autoincrement())
+  campaignApplicationId   Int?            @unique
+  campaignId              Int?
   issuerId                Int
   bloggerId               Int
   title                   String
   brief                   String?
+  /// Full TZ (technical specification) provided by issuer
+  tz                      String?
+  /// SocialPlatform or null
+  socialPlatform          String?
+  /// Name of the placement format (from blogger's price list)
+  formatName              String?
   amount                  Decimal
-  currency                CurrencyType
-  platformCommission      Decimal @default(0)
+  /// CurrencyType: RUB | USD | USDT
+  currency                String
+  platformCommission      Decimal         @default(0)
   bloggerAmount           Decimal
-  status                  DealStatus @default(CREATED)
+  /// DealStatus: CREATED | ESCROW_FUNDED | CONTENT_SUBMITTED | COMPLETED | DISPUTED | REFUNDED | CANCELLED
+  status                  String          @default("CREATED")
   contentUrl              String?
   contentSubmittedAt      DateTime?
   completedAt             DateTime?
-  createdAt               DateTime @default(now())
-  updatedAt               DateTime @updatedAt
+  createdAt               DateTime        @default(now())
+  updatedAt               DateTime        @updatedAt
 
   campaignApplication     CampaignApplication? @relation(fields: [campaignApplicationId], references: [id], onDelete: SetNull)
+  campaign                Campaign? @relation("campaignDeals", fields: [campaignId], references: [id], onDelete: SetNull)
   issuer                  IssuerProfile @relation(fields: [issuerId], references: [id], onDelete: Cascade)
   blogger                 BloggerProfile @relation("bloggerDeals", fields: [bloggerId], references: [id], onDelete: Cascade)
   dispute                 Dispute?
@@ -231,23 +207,16 @@ model Deal {
   transactions            Transaction[]
 }
 
-enum DealStatus {
-  CREATED
-  ESCROW_FUNDED
-  CONTENT_SUBMITTED
-  COMPLETED
-  DISPUTED
-  REFUNDED
-  CANCELLED
-}
-
 model Dispute {
   id          Int     @id @default(autoincrement())
   dealId      Int     @unique
-  openedBy    DisputeOpener
+  issuerId    Int?
+  /// DisputeOpener: ISSUER | BLOGGER
+  openedBy    String
   reason      String
   description String?
-  status      DisputeStatus @default(OPEN)
+  /// DisputeStatus: OPEN | UNDER_REVIEW | RESOLVED
+  status      String @default("OPEN")
   resolution  String?
   resolvedBy  Int?
   resolvedAt  DateTime?
@@ -255,23 +224,14 @@ model Dispute {
 
   deal        Deal @relation(fields: [dealId], references: [id], onDelete: Cascade)
   admin       User? @relation("resolvedDisputies", fields: [resolvedBy], references: [id], onDelete: SetNull)
-}
-
-enum DisputeOpener {
-  ISSUER
-  BLOGGER
-}
-
-enum DisputeStatus {
-  OPEN
-  UNDER_REVIEW
-  RESOLVED
+  issuer      IssuerProfile? @relation("issuerDisputes", fields: [issuerId], references: [id], onDelete: SetNull)
 }
 
 model Review {
   id          Int     @id @default(autoincrement())
   dealId      Int
-  authorRole  ReviewAuthor
+  /// ReviewAuthor: ISSUER | BLOGGER
+  authorRole  String
   issuerId    Int?
   bloggerId   Int?
   rating      Int
@@ -283,34 +243,51 @@ model Review {
   blogger     BloggerProfile? @relation("bloggerReviews", fields: [bloggerId], references: [id], onDelete: SetNull)
 }
 
-enum ReviewAuthor {
-  ISSUER
-  BLOGGER
-}
-
 model Transaction {
   id          Int     @id @default(autoincrement())
   dealId      Int
   userId      Int
-  type        TransactionType
+  /// TransactionType: ESCROW_DEPOSIT | PLATFORM_FEE | BLOGGER_PAYOUT | REFUND
+  type        String
   amount      Decimal
-  currency    CurrencyType
-  status      TransactionStatus @default(PENDING)
+  /// CurrencyType: RUB | USD | USDT
+  currency    String
+  /// TransactionStatus: PENDING | COMPLETED | FAILED
+  status      String @default("PENDING")
   createdAt   DateTime @default(now())
 
   deal        Deal @relation(fields: [dealId], references: [id], onDelete: Cascade)
   user        User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-enum TransactionType {
-  ESCROW_DEPOSIT
-  PLATFORM_FEE
-  BLOGGER_PAYOUT
-  REFUND
+/// Platform-level commission configuration (admin-managed)
+model CommissionSetting {
+  id          Int      @id @default(autoincrement())
+  /// null = global rate; set to bloggerId for per-blogger override
+  bloggerId   Int?     @unique
+  /// null for global+blogger; set to priceListItemId for per-service override
+  priceItemId Int?     @unique
+  /// Commission rate as decimal, e.g. 0.10 = 10%
+  rate        Decimal
+  updatedAt   DateTime @updatedAt
+  updatedBy   Int?
+
+  blogger     BloggerProfile? @relation(fields: [bloggerId], references: [id], onDelete: Cascade)
 }
 
-enum TransactionStatus {
-  PENDING
-  COMPLETED
-  FAILED
+/// Exclusive services available only through this platform
+model ExclusiveService {
+  id          Int             @id @default(autoincrement())
+  key         String          @unique
+  name        String
+  description String?
+  priceRub    Decimal         @default(0)
+  commRate    Decimal         @default(0.10)
+  /// Optional: linked to a specific blogger
+  bloggerId   Int?
+  isActive    Boolean         @default(true)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  blogger     BloggerProfile? @relation(fields: [bloggerId], references: [id], onDelete: SetNull)
 }

@@ -91,12 +91,18 @@ export class BloggersService {
       throw new NotFoundException('Blogger profile not found');
     }
 
-    return this.prisma.priceListItem.create({
-      data: {
-        bloggerId: profile.id,
-        ...dto,
-      },
-    });
+    // Sanitize: isSpecialProject=true → force priceRub=0; empty platform → null
+    const data: any = {
+      bloggerId: profile.id,
+      formatName: dto.formatName,
+      description: dto.description,
+      priceRub: dto.isSpecialProject ? 0 : (dto.priceRub ?? 0),
+      isAvailable: dto.isAvailable ?? true,
+      isSpecialProject: dto.isSpecialProject ?? false,
+      platform: dto.platform || null,
+    };
+
+    return this.prisma.priceListItem.create({ data });
   }
 
   async updatePriceItem(userId: number, itemId: number, dto: AddPriceItemDto) {
@@ -113,10 +119,17 @@ export class BloggersService {
       throw new ForbiddenException('You cannot update other bloggers price items');
     }
 
-    return this.prisma.priceListItem.update({
-      where: { id: itemId },
-      data: dto,
-    });
+    // Sanitize same way as addPriceItem
+    const data: any = {
+      formatName: dto.formatName,
+      description: dto.description,
+      priceRub: dto.isSpecialProject ? 0 : (dto.priceRub ?? item.priceRub),
+      isAvailable: dto.isAvailable ?? item.isAvailable,
+      isSpecialProject: dto.isSpecialProject ?? false,
+      platform: dto.platform || null,
+    };
+
+    return this.prisma.priceListItem.update({ where: { id: itemId }, data });
   }
 
   async deletePriceItem(userId: number, itemId: number) {
@@ -174,17 +187,61 @@ export class BloggersService {
     });
   }
 
-  async getAllBloggers() {
-    return this.prisma.bloggerProfile.findMany({
-      where: { isActive: true },
+  async getAllBloggers(filters?: {
+    platform?: string;
+    minFollowers?: number;
+    maxPrice?: number;
+    search?: string;
+  }) {
+    // Base query: only active bloggers
+    const bloggers = await this.prisma.bloggerProfile.findMany({
+      where: {
+        isActive: true,
+        // Full-text search on displayName / niche
+        ...(filters?.search
+          ? {
+              OR: [
+                { displayName: { contains: filters.search, mode: 'insensitive' } },
+                { niche: { contains: filters.search, mode: 'insensitive' } },
+              ],
+            }
+          : {}),
+      },
       include: {
-        user: {
-          select: { id: true, email: true },
-        },
+        user: { select: { id: true, email: true } },
         socialAccounts: true,
         priceListItems: true,
         portfolioItems: true,
       },
+    });
+
+    // Post-query filtering (platform, followers, price)
+    return bloggers.filter((b) => {
+      // Platform filter: blogger must have at least one social account on this platform
+      if (filters?.platform) {
+        const hasPlatform = b.socialAccounts.some(
+          (s) => s.platform === filters.platform,
+        );
+        if (!hasPlatform) return false;
+      }
+
+      // minFollowers: any social account meets the threshold
+      if (filters?.minFollowers) {
+        const maxFollowers = Math.max(...b.socialAccounts.map((s) => s.followersCount ?? 0), 0);
+        if (maxFollowers < filters.minFollowers) return false;
+      }
+
+      // maxPrice: blogger must have at least one non-special item within budget
+      if (filters?.maxPrice) {
+        const paidItems = b.priceListItems.filter(
+          (p) => p.isAvailable && !p.isSpecialProject && Number(p.priceRub) > 0,
+        );
+        if (paidItems.length === 0) return false;
+        const minPrice = Math.min(...paidItems.map((p) => Number(p.priceRub)));
+        if (minPrice > filters.maxPrice) return false;
+      }
+
+      return true;
     });
   }
 
